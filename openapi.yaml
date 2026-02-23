@@ -101,6 +101,19 @@ components:
         timestamp:
           type: string
           format: date-time
+    ErrorSubscriptionNotFound:
+      type: object
+      required: [ error, message ]
+      properties:
+        error:
+          type: string
+          example: "SUBSCRIPTION_NOT_FOUND"
+        message:
+          type: string
+          example: "Subscription not found"
+        timestamp:
+          type: string
+          format: date-time
 
 paths:
   /api/user/register:
@@ -313,3 +326,117 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /api/subscriptions/get/subscriptions:
+    get:
+      summary: Get all user subscriptions
+      tags:
+        - Subscriptions
+      security:
+        - BearerToken: [ ]
+      responses:
+        '200':
+          description: Subscriptions retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized (JWT missing or invalid)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidCredentialForSearchUser'
+        '404':
+          description: Subscriptions not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUserNotFound'
+
+  /api/subscriptions/update/{subscription_id}:
+    patch:
+      summary: Update some of field
+      tags:
+        - Subscriptions
+      security:
+        - Bearer Token: []
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  properties:
+                    name:
+                      type: string
+                      example: "T-pro"
+                    cost:
+                      type: number
+                      format: float
+                      example: 209.99
+      responses:
+        '200':
+          description: Subscription updated successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized (JWT missing or invalid)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Subscriptions not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSubscriptionNotFound'
+  /api/subscriptions/delete/{subscription_id}:
+    delete:
+      summary: Delete subscription
+      tags:
+        - Subscriptions
+      security:
+        - Bearer Token: [ ]
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+      responses:
+        '200':
+          description: Subscription deleted successfully
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized (JWT missing or invalid)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Subscriptions not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSubscriptionNotFound'
