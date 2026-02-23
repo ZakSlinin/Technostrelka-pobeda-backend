@@ -36,7 +36,7 @@ components:
           description: URL to user avatar
     Subscription:
       type: object
-      required: [subscription_id, user_id, name, cost, next_billing, status]
+      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url]
       properties:
         subscription_id:
           type: string
@@ -58,6 +58,10 @@ components:
         status:
           type: string
           example: paid/unpaid
+        subscription_avatar_url:
+          avatar_url:
+            type: string
+            description: URL to subscription avatar
 
 
     AuthTokens:
@@ -396,6 +400,7 @@ paths:
                 - cost
                 - next_billing
                 - status
+                - subscription_avatar
               properties:
                 name:
                   type: string
@@ -410,6 +415,11 @@ paths:
                 status:
                   type: string
                   example: unpaid
+                subscription_avatar:
+                  type: string
+                  format: binary
+                  description: User avatar file
+
       responses:
         '201':
           description: Subscription created successfully
@@ -437,6 +447,9 @@ paths:
                   status:
                     type: string
                     example: unpaid
+                  subscription_avatar_url:
+                    type: string
+                    example: url/url/url/avatar.png
         '400':
           description: Invalid request
           content:
@@ -504,6 +517,11 @@ paths:
                   type: number
                   format: float
                   example: 209.99
+                subscription_avatar:
+                  type: string
+                  format: binary
+                  description: User avatar file
+
       responses:
         '200':
           description: Subscription updated successfully
