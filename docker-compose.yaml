@@ -32,6 +32,16 @@ services:
 
     depends_on:
       - users-database      
+     
+  avatars:
+    build:
+      context: ./user-service/backend/avatars/
+    volumes:
+      - ./user-service/backend/avatars/:/usr/share/nginx/html/avatars/
+    ports:
+     - "8040:80"
+    environment:
+     - NGINX_PORT=8040
       
   users-database:
     image: postgres:17.2-alpine3.21
