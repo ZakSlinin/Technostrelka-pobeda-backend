@@ -36,7 +36,7 @@ components:
           description: URL to user avatar
     Subscription:
       type: object
-      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url]
+      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url, category]
       properties:
         subscription_id:
           type: string
@@ -59,10 +59,11 @@ components:
           type: string
           example: paid/unpaid
         subscription_avatar_url:
-          avatar_url:
-            type: string
-            description: URL to subscription avatar
-
+          type: string
+          example: url/url/avsuburl.jpeg
+        category:
+          type: string
+          example: music
 
     AuthTokens:
       type: object
@@ -401,6 +402,7 @@ paths:
                 - next_billing
                 - status
                 - subscription_avatar
+                - category
               properties:
                 name:
                   type: string
@@ -497,7 +499,7 @@ paths:
       security:
         - BearerToken: []
       parameters:
-        - name: subscription_id
+        - subscription_id: subscription_id
           in: path
           required: true
           schema:
@@ -512,7 +514,7 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "T-pro"
+                  example: T-pro
                 cost:
                   type: number
                   format: float
@@ -521,6 +523,9 @@ paths:
                   type: string
                   format: binary
                   description: User avatar file
+                category:
+                  type: string
+                  example: cinema
 
       responses:
         '200':
