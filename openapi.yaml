@@ -53,8 +53,8 @@ components:
           example: 123.123
         next_billing:
           type: string
-          format: email
-          example:
+          format: date-time
+          description: "Дата и время следующей оплаты в формате ISO 8601"
         status:
           type: string
           example: paid/unpaid
@@ -417,7 +417,8 @@ paths:
                   example: 150.54
                 next_billing:
                   type: string
-                  example: 27.04.2026
+                  format: date-time
+                  description: "Дата и время следующей оплаты в формате ISO 8601"
                 status:
                   type: string
                   example: unpaid
@@ -455,7 +456,8 @@ paths:
                     example: 150.54
                   next_billing:
                     type: string
-                    example: 27.04.2026
+                    format: date-time
+                    description: "Дата и время следующей оплаты в формате ISO 8601"
                   status:
                     type: string
                     example: unpaid
@@ -534,6 +536,10 @@ paths:
                   type: number
                   format: float
                   example: 209.99
+                next_billing:
+                  type: string
+                  format: date-time
+                  description: "Дата и время следующей оплаты в формате ISO 8601"
                 subscription_avatar:
                   type: string
                   format: binary
