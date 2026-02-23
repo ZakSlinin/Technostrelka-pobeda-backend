@@ -36,7 +36,7 @@ components:
           description: URL to user avatar
     Subscription:
       type: object
-      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url]
+      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url, category, url_service]
       properties:
         subscription_id:
           type: string
@@ -53,16 +53,20 @@ components:
           example: 123.123
         next_billing:
           type: string
-          format: email
-          example:
+          format: date-time
+          description: "Дата и время следующей оплаты в формате ISO 8601"
         status:
           type: string
           example: paid/unpaid
         subscription_avatar_url:
-          avatar_url:
-            type: string
-            description: URL to subscription avatar
-
+          type: string
+          example: url/url/avsuburl.jpeg
+        category:
+          type: string
+          example: music
+        url_service:
+          type: string
+          example: url for some service
 
     AuthTokens:
       type: object
@@ -401,6 +405,8 @@ paths:
                 - next_billing
                 - status
                 - subscription_avatar
+                - category
+                - url_service
               properties:
                 name:
                   type: string
@@ -411,7 +417,8 @@ paths:
                   example: 150.54
                 next_billing:
                   type: string
-                  example: 27.04.2026
+                  format: date-time
+                  description: "Дата и время следующей оплаты в формате ISO 8601"
                 status:
                   type: string
                   example: unpaid
@@ -419,6 +426,12 @@ paths:
                   type: string
                   format: binary
                   description: User avatar file
+                category:
+                  type: string
+                  example: music
+                url_service:
+                  type: string
+                  example: url for some service
 
       responses:
         '201':
@@ -443,13 +456,20 @@ paths:
                     example: 150.54
                   next_billing:
                     type: string
-                    example: 27.04.2026
+                    format: date-time
+                    description: "Дата и время следующей оплаты в формате ISO 8601"
                   status:
                     type: string
                     example: unpaid
                   subscription_avatar_url:
                     type: string
                     example: url/url/url/avatar.png
+                  category:
+                    type: string
+                    example: music
+                  url_service:
+                    type: string
+                    example: url for some service
         '400':
           description: Invalid request
           content:
@@ -497,14 +517,13 @@ paths:
       security:
         - BearerToken: []
       parameters:
-        - name: subscription_id
+        - subscription_id: subscription_id
           in: path
           required: true
           schema:
             type: string
             example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
@@ -512,15 +531,25 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "T-pro"
+                  example: T-pro
                 cost:
                   type: number
                   format: float
                   example: 209.99
+                next_billing:
+                  type: string
+                  format: date-time
+                  description: "Дата и время следующей оплаты в формате ISO 8601"
                 subscription_avatar:
                   type: string
                   format: binary
                   description: User avatar file
+                category:
+                  type: string
+                  example: cinema
+                url_service:
+                  type: string
+                  example: url for some service
 
       responses:
         '200':
