@@ -1,4 +1,5 @@
 import os
+from datetime import timedelta
 
 """
 Django settings for backend project.
@@ -151,3 +152,7 @@ REST_FRAMEWORK = {
     ]
 }
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024**10
+SIMPLE_JWT = {
+"ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+"REFRESH_TOKEN_LIFETIME": timedelta(days=2),
+}
