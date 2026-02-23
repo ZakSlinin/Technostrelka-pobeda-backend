@@ -14,6 +14,7 @@ CREATE TABLE subscriptions (
    subscription_avatar_url TEXT,
    category TEXT,
    url_service TEXT,
+   use_in_this_month BOOLEAN,
 
    FOREIGN KEY (user_id)
        REFERENCES users(id)
