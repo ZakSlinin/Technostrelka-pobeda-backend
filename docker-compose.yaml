@@ -12,6 +12,33 @@ services:
       - ./openapi.yaml:/openapi.yaml:ro
     networks:
       - gzg-money-network
+      
+  user-service:
+    build:
+      context: ./user-service/
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./user-service/backend:/backend
+
+    environment:
+      - DB_HOST=users-database
+      - DB_NAME=dbname
+      - DB_USER=dbuser
+      - DB_PASS=pass
+
+    command: >
+      sh -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8080"
+
+    depends_on:
+      - users-database      
+      
+  users-database:
+    image: postgres:17.2-alpine3.21
+    environment:
+      - POSTGRES_DB=dbname
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=pass
 networks:
   gzg-money-network:
     driver: bridge
