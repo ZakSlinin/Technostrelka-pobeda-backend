@@ -55,9 +55,10 @@ components:
           type: string
           format: email
           example:
-        avatar_url:
+        status:
           type: string
-          description: URL to user avatar
+          example: paid/unpaid
+
 
     AuthTokens:
       type: object
@@ -112,7 +113,7 @@ components:
         timestamp:
           type: string
           format: date-time
-    ErrorInvalidCredentialForSearchUser:
+    ErrorInvalidCredentialForSearch:
       type: object
       required: [ error, message ]
       properties:
@@ -261,7 +262,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorInvalidCredentialForSearchUser'
+                $ref: '#/components/schemas/ErrorInvalidCredentialForSearch'
         '404':
           description: User not found
           content:
@@ -393,6 +394,8 @@ paths:
               required:
                 - name
                 - cost
+                - next_billing
+                - status
               properties:
                 name:
                   type: string
@@ -401,6 +404,12 @@ paths:
                   type: number
                   format: float
                   example: 150.54
+                next_billing:
+                  type: string
+                  example: 27.04.2026
+                status:
+                  type: string
+                  example: unpaid
       responses:
         '201':
           description: Subscription created successfully
@@ -422,6 +431,12 @@ paths:
                     type: number
                     format: float
                     example: 150.54
+                  next_billing:
+                    type: string
+                    example: 27.04.2026
+                  status:
+                    type: string
+                    example: unpaid
         '400':
           description: Invalid request
           content:
@@ -447,19 +462,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Subscription'
         '401':
           description: Unauthorized (JWT missing or invalid)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorInvalidCredentialForSearchUser'
+                $ref: '#/components/schemas/ErrorInvalidCredentialForSearch'
         '404':
           description: Subscriptions not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorUserNotFound'
+                $ref: '#/components/schemas/ErrorSubscriptionNotFound'
 
   /api/subscriptions/update/{subscription_id}:
     patch:
@@ -484,14 +499,11 @@ paths:
               properties:
                 name:
                   type: string
-                  properties:
-                    name:
-                      type: string
-                      example: "T-pro"
-                    cost:
-                      type: number
-                      format: float
-                      example: 209.99
+                  example: "T-pro"
+                cost:
+                  type: number
+                  format: float
+                  example: 209.99
       responses:
         '200':
           description: Subscription updated successfully
