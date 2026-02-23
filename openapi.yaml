@@ -36,7 +36,7 @@ components:
           description: URL to user avatar
     Subscription:
       type: object
-      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url, category]
+      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url, category, url_service]
       properties:
         subscription_id:
           type: string
@@ -64,6 +64,9 @@ components:
         category:
           type: string
           example: music
+        url_service:
+          type: string
+          example: url for some service
 
     AuthTokens:
       type: object
@@ -403,6 +406,7 @@ paths:
                 - status
                 - subscription_avatar
                 - category
+                - url_service
               properties:
                 name:
                   type: string
@@ -421,6 +425,12 @@ paths:
                   type: string
                   format: binary
                   description: User avatar file
+                category:
+                  type: string
+                  example: music
+                url_service:
+                  type: string
+                  example: url for some service
 
       responses:
         '201':
@@ -452,6 +462,12 @@ paths:
                   subscription_avatar_url:
                     type: string
                     example: url/url/url/avatar.png
+                  category:
+                    type: string
+                    example: music
+                  url_service:
+                    type: string
+                    example: url for some service
         '400':
           description: Invalid request
           content:
@@ -506,7 +522,6 @@ paths:
             type: string
             example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
@@ -526,6 +541,9 @@ paths:
                 category:
                   type: string
                   example: cinema
+                url_service:
+                  type: string
+                  example: url for some service
 
       responses:
         '200':
