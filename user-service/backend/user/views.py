@@ -96,7 +96,7 @@ def update_user(request, *args, **kwargs):
 @api_view(['POST'])
 @authentication_classes(())
 def refresh_token(request, *args, **kwargs):
-	token = SuperPuperToken(request.data["refresh_token"])
+	token = RefreshToken(request.data["refresh_token"])
 	res_obj = {
 		"tokens": {
 			"acces_token": str(token.access_token),
