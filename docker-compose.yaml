@@ -17,7 +17,7 @@ services:
     build:
       context: ./user-service/
     ports:
-      - "8080:8080"
+      - "8088:8080"
     volumes:
       - ./user-service/backend:/backend
 
@@ -31,7 +31,25 @@ services:
       sh -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8080"
 
     depends_on:
-      - users-database      
+      - users-database     
+
+  gateway-service:
+    build:
+      context: ./gateway-service/
+    ports:
+      - "8080:8080"  
+    volumes:
+      - ./gateway-service/code:/code
+ 
+  avatars:
+    build:
+      context: ./user-service/backend/avatars/
+    volumes:
+      - ./user-service/backend/avatars/:/usr/share/nginx/html/avatars/
+    ports:
+     - "8040:80"
+    environment:
+     - NGINX_PORT=8040
       
   users-database:
     image: postgres:17.2-alpine3.21
