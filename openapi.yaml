@@ -16,7 +16,7 @@ components:
   schemas:
     User:
       type: object
-      required: [user_id, username, fullname, email, avatar_url]
+      required: [user_id, username, fullname, email, avatar_url, notifications]
       properties:
         user_id:
           type: string
@@ -34,9 +34,12 @@ components:
         avatar_url:
           type: string
           description: URL to user avatar
+        notifications:
+          type: boolean
+          example: true
     Subscription:
       type: object
-      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url]
+      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url, category, url_service, use_in_this_month, notifications]
       properties:
         subscription_id:
           type: string
@@ -53,15 +56,23 @@ components:
           example: 123.123
         next_billing:
           type: string
-          format: email
-          example:
+          format: date-time
+          description: "Дата и время следующей оплаты в формате ISO 8601"
         status:
           type: string
           example: paid/unpaid
         subscription_avatar_url:
-          avatar_url:
-            type: string
-            description: URL to subscription avatar
+          type: string
+          example: url/url/avsuburl.jpeg
+        category:
+          type: string
+          example: music
+        url_service:
+          type: string
+          example: url for some service
+        use_in_this_month:
+          type: boolean
+          example: true
 
 
     AuthTokens:
@@ -156,7 +167,7 @@ paths:
           multipart/form-data:
             schema:
               type: object
-              required: [username, fullname, email, password, avatar]
+              required: [username, fullname, email, password, avatar, notifications]
               properties:
                 username:
                   type: string
@@ -187,6 +198,9 @@ paths:
                   type: string
                   format: binary
                   description: User avatar file
+                notifications:
+                  type: boolean
+                  example: true
       responses:
         '201':
           description: User created successfully
@@ -316,7 +330,6 @@ paths:
             type: string
             example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
       requestBody:
-        required: true
         content:
           multipart/form-data:
             schema:
@@ -335,9 +348,12 @@ paths:
                     email:
                       type: string
                       example: example@gmail.com
+                    notifications:
+                      type: boolean
+                      example: true
       responses:
         '200':
-          description: Subscription updated successfully
+          description: User updated successfully
         '400':
           description: Invalid request
           content:
@@ -351,11 +367,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
         '404':
-          description: Subscriptions not found
+          description: User not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorSubscriptionNotFound'
+                $ref: '#/components/schemas/ErrorUserNotFound'
 
 
   /api/user/refresh:
@@ -401,6 +417,9 @@ paths:
                 - next_billing
                 - status
                 - subscription_avatar
+                - category
+                - url_service
+                - use_in_this_month
               properties:
                 name:
                   type: string
@@ -411,7 +430,8 @@ paths:
                   example: 150.54
                 next_billing:
                   type: string
-                  example: 27.04.2026
+                  format: date-time
+                  description: "Дата и время следующей оплаты в формате ISO 8601"
                 status:
                   type: string
                   example: unpaid
@@ -419,6 +439,15 @@ paths:
                   type: string
                   format: binary
                   description: User avatar file
+                category:
+                  type: string
+                  example: music
+                url_service:
+                  type: string
+                  example: url for some service
+                use_in_this_month:
+                  type: boolean
+                  example: false
 
       responses:
         '201':
@@ -443,13 +472,23 @@ paths:
                     example: 150.54
                   next_billing:
                     type: string
-                    example: 27.04.2026
+                    format: date-time
+                    description: "Дата и время следующей оплаты в формате ISO 8601"
                   status:
                     type: string
                     example: unpaid
                   subscription_avatar_url:
                     type: string
                     example: url/url/url/avatar.png
+                  category:
+                    type: string
+                    example: music
+                  url_service:
+                    type: string
+                    example: url for some service
+                  use_in_this_month:
+                    type: boolean
+                    example: false
         '400':
           description: Invalid request
           content:
@@ -497,14 +536,13 @@ paths:
       security:
         - BearerToken: []
       parameters:
-        - name: subscription_id
+        - subscription_id: subscription_id
           in: path
           required: true
           schema:
             type: string
             example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
       requestBody:
-        required: true
         content:
           application/json:
             schema:
@@ -512,15 +550,28 @@ paths:
               properties:
                 name:
                   type: string
-                  example: "T-pro"
+                  example: T-pro
                 cost:
                   type: number
                   format: float
                   example: 209.99
+                next_billing:
+                  type: string
+                  format: date-time
+                  description: "Дата и время следующей оплаты в формате ISO 8601"
                 subscription_avatar:
                   type: string
                   format: binary
                   description: User avatar file
+                category:
+                  type: string
+                  example: cinema
+                url_service:
+                  type: string
+                  example: url for some service
+                use_in_this_month:
+                  type: boolean
+                  example: false
 
       responses:
         '200':
