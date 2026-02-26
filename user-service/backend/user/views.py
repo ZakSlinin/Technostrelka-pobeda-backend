@@ -78,20 +78,30 @@ def delete_user(request, *args, **kwargs):
 
 @api_view(['PATCH'])
 def update_user(request, *args, **kwargs):
-	serializer = UserSerializer(request.user, data=request.data)
-	if serializer.is_valid():
-		user = User.objects.get(id=request.user.id)
-		serializer.save()
-		res_obj = {
-		"user": {
-		"id": str(user.user_id),
-		"username": str(user.username),
-		"fullname": str(user.fullname),
-		"email": str(user.email),
-		"avatar_url": str(user.avatar),
-		}}
-		return Response("User updated successfully", status=200)
-	return Response(serializer.errors, status=400)
+	user = User.objects.get(id=request.user.id)
+	if request.data["password"]:
+		user.password = request.data["password"]
+	if request.data["email"]:
+		user.email = request.data["email"]
+	if request.data["username"] :
+		user.username = request.data["username"]
+	if request.data["fullname"]:
+		user.fullname = request.data["fullname"]
+	if request.data["id"]:
+		user.user_id = request.data["id"]
+	if request.data["avatar"]:
+		user.avatar = request.data["avatar"]
+	user.save()
+
+	res_obj = {
+	"user": {
+	"id": str(user.user_id),
+	"username": str(user.username),
+	"fullname": str(user.fullname),
+	"email": str(user.email),
+	"avatar_url": str(user.avatar),
+	}}
+	return Response("User updated successfully", status=200)
 
 @api_view(['POST'])
 @authentication_classes(())
