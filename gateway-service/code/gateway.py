@@ -5,6 +5,7 @@ from aiohttp import web
 import aiohttp_cors
 import handlers
 
+
 app = web.Application()
 
 cors = aiohttp_cors.setup(app, defaults={

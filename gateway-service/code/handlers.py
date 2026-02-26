@@ -1,4 +1,5 @@
 import aiohttp
+import os
 import asyncio
 from aiohttp import web
 from aiohttp import FormData
@@ -6,7 +7,7 @@ from aiohttp import FormData
 
 async def user_get_handler(request):
 	async with aiohttp.ClientSession() as session:
-        		async with session.get('http://localhost:8088/api/user', headers=request.headers) as response:
+        		async with session.get(f'http://{os.environ.get("user_service_host")}:8080/api/user', headers=request.headers) as response:
         			data = await response.json()
         			return web.json_response(data, status=response.status)
 			
@@ -29,22 +30,22 @@ async def user_register_handler(request):
 		field = await reader.next()
 				
 	async with aiohttp.ClientSession() as session:
-        		async with session.post('http://localhost:8088/api/user/register', data=request_data) as response:
+        		async with session.post(f'http://{os.environ.get("user_service_host")}:8080/api/user/register', data=request_data) as response:
         			return web.json_response(await response.json(), status=response.status)
 	
 async def user_login_handler(request):
 	async with aiohttp.ClientSession() as session:
-		async with session.post('http://localhost:8088/api/user/login', data=await request.json()) as response:
+		async with session.post(f'http://{os.environ.get("user_service_host")}:8080/api/user/login', data=await request.json()) as response:
 			return web.json_response(await response.json(), status=200)
 			
 async def refresh_token_handler(request):
 	async with aiohttp.ClientSession() as session:
-		async with session.post('http://localhost:8088/api/user/refresh', data=await request.json()) as response:
+		async with session.post(f'http://{os.environ.get("user_service_host")}:8080/api/user/refresh', data=await request.json()) as response:
 			return web.json_response(await response.json(), status=200)
 			
 async def user_delete_handler(request):
 	async with aiohttp.ClientSession() as session:
-		async with session.delete('http://localhost:8088/api/user/delete', headers=request.headers) as response:
+		async with session.delete(f'http://{os.environ.get("user_service_host")}:8080/api/user/delete', headers=request.headers) as response:
 			return web.json_response(await response.json(), status=200)
 
 async def user_update_handler(request):
@@ -67,13 +68,13 @@ async def user_update_handler(request):
 		field = await reader.next()
 				
 	async with aiohttp.ClientSession() as session:
-        		async with session.patch('http://localhost:8088/api/user/update', data=request_data, headers=headers) as response:
+        		async with session.patch(f'http://{os.environ.get("user_service_host")}:8080/api/user/update', data=request_data, headers=headers) as response:
         			return web.json_response(await response.json(), status=response.status)
         			
         			
 async def get_avatar_handler(request):
 	file_name =request.match_info.get('file', "file.jpg")
 	async with aiohttp.ClientSession() as session:
-		async with session.post(f'http://localhost:8040/avatars/{file_name}') as response:
+		async with session.get(f'http://{os.environ.get("avatars_host")}/avatars/{file_name}') as response:
 			return web.Response(body=await response.read(), \
 			headers={'Content-Disposition': f'attachment; filename={file_name}', 'Content-Type': 'application/octet-stream'})

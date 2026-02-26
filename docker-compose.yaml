@@ -40,6 +40,9 @@ services:
       - "8080:8080"  
     volumes:
       - ./gateway-service/code:/code
+    environment:
+      - user_service_host=user-service
+      - avatars_host=avatars
  
   avatars:
     build:
