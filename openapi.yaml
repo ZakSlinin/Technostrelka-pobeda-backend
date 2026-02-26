@@ -39,7 +39,7 @@ components:
           example: true
     Subscription:
       type: object
-      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url, category, url_service, use_in_this_month, notifications]
+      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url, category, url_service, use_in_this_month]
       properties:
         subscription_id:
           type: string
@@ -534,7 +534,7 @@ paths:
       tags:
         - Subscriptions
       security:
-        - BearerToken: []  
+        - BearerToken: []
       requestBody:
         content:
           application/json:
