@@ -30,8 +30,6 @@ type UpdateSubscriptionRequest struct {
 }
 
 type CreateSubscriptionRequest struct {
-	SubscriptionID         string    `gorm:"column:subscription_id" json:"subscription_id"`
-	UserID                 string    `gorm:"column:user_id" json:"user_id"`
 	Name                   string    `gorm:"column:name" json:"name"`
 	Cost                   float64   `gorm:"column:cost" json:"cost"`
 	NextBilling            time.Time `gorm:"column:next_billing" json:"next_billing"`
