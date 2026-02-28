@@ -39,7 +39,7 @@ components:
           example: true
     Subscription:
       type: object
-      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url, category, url_service, use_in_this_month]
+      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url, category, url_service, use_in_this_month, cancellation_link]
       properties:
         subscription_id:
           type: string
@@ -73,6 +73,9 @@ components:
         use_in_this_month:
           type: boolean
           example: true
+        cancellation_link:
+          type: string
+          example: link to cancellation service
 
 
     AuthTokens:
@@ -448,6 +451,9 @@ paths:
                 use_in_this_month:
                   type: boolean
                   example: false
+                cancellation_link:
+                  type: string
+                  example: link to cancellation service
 
       responses:
         '201':
@@ -489,6 +495,9 @@ paths:
                   use_in_this_month:
                     type: boolean
                     example: false
+                  cancellation_link:
+                    type: string
+                    example: link to cancellation service
         '400':
           description: Invalid request
           content:
@@ -561,10 +570,13 @@ paths:
                   example: cinema
                 url_service:
                   type: string
-                  example: url for some service
+                  example: url of any service
                 use_in_this_month:
                   type: boolean
                   example: false
+                cancellation_link:
+                  type: string
+                  example: link to cancellation service
 
       responses:
         '200':
