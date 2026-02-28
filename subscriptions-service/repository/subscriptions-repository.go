@@ -58,6 +58,9 @@ func (r *PostgresSubscriptionsRepository) GetAllByUserID(ctx context.Context, us
 		Find(&subs)
 
 	if result.Error != nil {
+		if result.RowsAffected == 0 {
+			return nil, errors.New("subscriptions not found")
+		}
 		return nil, fmt.Errorf("failed to fetch subscriptions: %w", result.Error)
 	}
 

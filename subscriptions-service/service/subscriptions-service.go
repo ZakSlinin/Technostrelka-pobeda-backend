@@ -85,6 +85,24 @@ func (s *SubscriptionsService) UpdateSubscriptionByID(ctx context.Context, userI
 	return nil
 }
 
+func (s *SubscriptionsService) GetAllUserByID(ctx context.Context, userID uuid.UUID) ([]model.Subscriptions, *ErrorMessage) {
+	subs, err := s.repo.GetAllByUserID(ctx, userID)
+
+	if err != nil {
+		if err.Error() == "subscription not found" {
+			return nil, NewSubscriptionNotFound()
+		}
+
+		return nil, &ErrorMessage{
+			Error:     "INTERNAL_ERROR",
+			Message:   err.Error(),
+			Timestamp: timestamppb.Now(),
+		}
+	}
+
+	return subs, nil
+}
+
 func (s *SubscriptionsService) DeleteSubscriptionByID(ctx context.Context, id, userID uuid.UUID) *ErrorMessage {
 	err := s.repo.Delete(ctx, id, userID)
 	if err != nil {
