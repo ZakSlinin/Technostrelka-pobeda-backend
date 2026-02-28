@@ -1,21 +1,21 @@
-CREATE TYPE subscription_status AS ENUM ('paid', 'unpaid');
-
 CREATE TABLE subscriptions (
-   subscription_id UUID NOT NULL,
-   user_id UUID NOT NULL,
+    subscription_id UUID NOT NULL,
+    user_id UUID NOT NULL,
 
-   name TEXT NOT NULL,
-   cost NUMERIC(10,2) NOT NULL CHECK (cost >= 0),
+    name TEXT NOT NULL,
+    cost NUMERIC(10,2) NOT NULL CHECK (cost >= 0),
 
-   next_billing TIMESTAMP NOT NULL,
+    next_billing TIMESTAMP NOT NULL,
 
-   status subscription_status NOT NULL DEFAULT 'unpaid',
+    status BOOLEAN,
 
-   subscription_avatar_url TEXT,
-   category TEXT,
-   url_service TEXT,
+    subscription_avatar_url TEXT,
+    category TEXT,
+    url_service TEXT,
+    use_in_this_month BOOLEAN,
+    cancellation_link TEXT,
 
-   FOREIGN KEY (user_id)
+    FOREIGN KEY (user_id)
        REFERENCES users(id)
        ON DELETE CASCADE
 );
