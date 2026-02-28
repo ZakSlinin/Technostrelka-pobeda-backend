@@ -1,11 +1,12 @@
 package model
 
 import (
+	"github.com/google/uuid"
 	"time"
 )
 
 type Subscriptions struct {
-	SubscriptionID        string    `gorm:"primaryKey;column:subscription_id" json:"subscription_id"`
+	SubscriptionID        uuid.UUID `gorm:"primaryKey;column:subscription_id" json:"subscription_id"`
 	UserID                string    `gorm:"column:user_id" json:"user_id"`
 	Name                  string    `gorm:"column:name" json:"name"`
 	Cost                  float64   `gorm:"column:cost" json:"cost"`
