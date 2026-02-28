@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/ZakSlinin/Technostrelka-pobeda-backend/subscriptions-service/model"
 	"github.com/ZakSlinin/Technostrelka-pobeda-backend/subscriptions-service/repository"
+	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type SubscriptionsService struct {
@@ -16,10 +18,18 @@ func NewSubscriptionsService(repo repository.SubscriptionsRepository) *Subscript
 	}
 }
 
-func (s *SubscriptionsService) Create(ctx context.Context, sub *model.CreateSubscriptionRequest) (*model.Subscriptions, error) {
+type ErrorMessage struct {
+	Error     string                 `json:"error"`
+	Message   string                 `json:"message"`
+	Timestamp *timestamppb.Timestamp `json:"timestamp"`
+}
+
+func (s *SubscriptionsService) Create(ctx context.Context, userID uuid.UUID, sub *model.CreateSubscriptionRequest) (*model.Subscriptions, error) {
+	subscriptionID, err := uuid.NewUUID()
+
 	subscription := &model.Subscriptions{
-		SubscriptionID:        sub.SubscriptionID,
-		UserID:                sub.UserID,
+		SubscriptionID:        subscriptionID,
+		UserID:                userID,
 		Name:                  sub.Name,
 		NextBilling:           sub.NextBilling,
 		Status:                sub.Status,
@@ -36,4 +46,18 @@ func (s *SubscriptionsService) Create(ctx context.Context, sub *model.CreateSubs
 	}
 
 	return createdSubscription, nil
+}
+
+func (s *SubscriptionsService) UpdateSubscriptionByID(ctx context.Context, userID, id uuid.UUID, req *model.UpdateSubscriptionRequest) (string, *ErrorMessage) {
+	err := s.repo.UpdateSubscriptionByID(ctx, id, userID, req)
+
+	if err != nil {
+		return "", &ErrorMessage{
+			Error:     "UPDATE_ERROR",
+			Message:   err.Error(),
+			Timestamp: timestamppb.Now(),
+		}
+	}
+
+	return "Subscription updated successfully", nil
 }
