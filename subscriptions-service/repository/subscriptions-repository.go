@@ -5,14 +5,15 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ZakSlinin/Technostrelka-pobeda-backend/subscriptions-service/model"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type SubscriptionsRepository interface {
 	Create(ctx context.Context, sub *model.Subscriptions) (*model.Subscriptions, error)
-	UpdateSubscriptionByID(id string, req *model.UpdateSubscriptionRequest)
-	GetAllByUserID(userID string) (*model.Subscriptions, error)
-	Delete(ctx context.Context, subscriptionID string) error
+	UpdateSubscriptionByID(ctx context.Context, id, userID uuid.UUID, req *model.UpdateSubscriptionRequest) error
+	GetAllByUserID(ctx context.Context, userID uuid.UUID) ([]model.Subscriptions, error)
+	Delete(ctx context.Context, id, userID uuid.UUID) error
 }
 
 type PostgresSubscriptionsRepository struct {
@@ -24,7 +25,7 @@ func NewPostgresSubscriptionsRepository(db *gorm.DB) *PostgresSubscriptionsRepos
 }
 
 func (r *PostgresSubscriptionsRepository) Create(ctx context.Context, sub *model.Subscriptions) (*model.Subscriptions, error) {
-	err := r.db.WithContext(ctx).Create(sub).Error
+	err := r.db.WithContext(ctx).Model(&model.Subscriptions{}).Create(sub).Error
 
 	if err != nil {
 		return nil, err
@@ -33,9 +34,9 @@ func (r *PostgresSubscriptionsRepository) Create(ctx context.Context, sub *model
 	return sub, nil
 }
 
-func (r *PostgresSubscriptionsRepository) UpdateSubscriptionByID(ctx context.Context, id string, req *model.UpdateSubscriptionRequest) error {
-	result := r.db.WithContext(ctx).
-		Where("subscription_id = ?", id).
+func (r *PostgresSubscriptionsRepository) UpdateSubscriptionByID(ctx context.Context, id, userID uuid.UUID, req *model.UpdateSubscriptionRequest) error {
+	result := r.db.WithContext(ctx).Model(&model.Subscriptions{}).
+		Where("subscription_id = ? AND user_id = ?", id, userID).
 		Updates(req)
 
 	if result.Error != nil {
@@ -63,9 +64,9 @@ func (r *PostgresSubscriptionsRepository) GetAllByUserID(ctx context.Context, us
 	return subs, nil
 }
 
-func (r *PostgresSubscriptionsRepository) Delete(ctx context.Context, subID string) error {
+func (r *PostgresSubscriptionsRepository) Delete(ctx context.Context, id, userID uuid.UUID) error {
 	result := r.db.WithContext(ctx).
-		Where("subscription_id = ?", subID).
+		Where("subscription_id = ? and user_id = ?", id, userID).
 		Delete(&model.Subscriptions{})
 
 	if result.Error != nil {
