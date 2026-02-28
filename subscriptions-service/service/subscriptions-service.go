@@ -98,4 +98,6 @@ func (s *SubscriptionsService) DeleteSubscriptionByID(ctx context.Context, id, u
 			Timestamp: timestamppb.Now(),
 		}
 	}
+
+	return nil
 }
