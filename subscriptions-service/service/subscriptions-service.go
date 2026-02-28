@@ -24,6 +24,22 @@ type ErrorMessage struct {
 	Timestamp *timestamppb.Timestamp `json:"timestamp"`
 }
 
+func NewValidationError(message string) *ErrorMessage {
+	return &ErrorMessage{
+		Error:     "VALIDATION_ERROR",
+		Message:   message,
+		Timestamp: timestamppb.Now(),
+	}
+}
+
+func NewSubscriptionNotFound() *ErrorMessage {
+	return &ErrorMessage{
+		Error:     "SUBSCRIPTION_NOT_FOUND",
+		Message:   "Subscription not found",
+		Timestamp: timestamppb.Now(),
+	}
+}
+
 func (s *SubscriptionsService) Create(ctx context.Context, userID uuid.UUID, sub *model.CreateSubscriptionRequest) (*model.Subscriptions, error) {
 	subscriptionID, err := uuid.NewUUID()
 
@@ -48,16 +64,23 @@ func (s *SubscriptionsService) Create(ctx context.Context, userID uuid.UUID, sub
 	return createdSubscription, nil
 }
 
-func (s *SubscriptionsService) UpdateSubscriptionByID(ctx context.Context, userID, id uuid.UUID, req *model.UpdateSubscriptionRequest) (string, *ErrorMessage) {
-	err := s.repo.UpdateSubscriptionByID(ctx, id, userID, req)
+func (s *SubscriptionsService) UpdateSubscriptionByID(ctx context.Context, userID, id uuid.UUID, req *model.UpdateSubscriptionRequest) *ErrorMessage {
+	if req.Cost != nil && *req.Cost < 0 {
+		return NewValidationError("Cost cannot be negative")
+	}
 
+	err := s.repo.UpdateSubscriptionByID(ctx, id, userID, req)
 	if err != nil {
-		return "", &ErrorMessage{
-			Error:     "UPDATE_ERROR",
+		if err.Error() == "subscription not found" {
+			return NewSubscriptionNotFound()
+		}
+
+		return &ErrorMessage{
+			Error:     "INTERNAL_ERROR",
 			Message:   err.Error(),
 			Timestamp: timestamppb.Now(),
 		}
 	}
 
-	return "Subscription updated successfully", nil
+	return nil
 }
