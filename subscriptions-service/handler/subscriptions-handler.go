@@ -41,7 +41,7 @@ func (h *SubscriptionsHandler) Create(g *gin.Context) {
 
 func (h *SubscriptionsHandler) UpdateSubscriptionByID(g *gin.Context) {
 	userIDStr := g.GetHeader("X-User-Id")
-	subscriptionIDStr := g.Param("X-Subscription-Id")
+	subscriptionIDStr := g.Param("subscription_id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id format"})
@@ -79,8 +79,7 @@ func (h *SubscriptionsHandler) UpdateSubscriptionByID(g *gin.Context) {
 }
 
 func (h *SubscriptionsHandler) GetAllUserByID(g *gin.Context) {
-	userIDStr := g.Param("user_id")
-	userID, err := uuid.Parse(userIDStr)
+	userID, err := uuid.Parse(g.GetHeader("X-User-Id"))
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id format"})
 		return
@@ -89,7 +88,7 @@ func (h *SubscriptionsHandler) GetAllUserByID(g *gin.Context) {
 	result, errMsg := h.subscriptionsService.GetAllUserByID(g.Request.Context(), userID)
 
 	if errMsg != nil {
-		g.JSON(http.StatusInternalServerError, gin.H{"error": errMsg})
+		g.JSON(http.StatusInternalServerError, errMsg)
 		return
 	}
 
@@ -97,24 +96,21 @@ func (h *SubscriptionsHandler) GetAllUserByID(g *gin.Context) {
 }
 
 func (h *SubscriptionsHandler) DeleteSubscriptionByID(g *gin.Context) {
-	userIDStr := g.Param("user_id")
-	subscriptionIDStr := g.Param("subscription_id")
+	userID, errU := uuid.Parse(g.GetHeader("X-User-Id"))
+	subscriptionID, errS := uuid.Parse(g.Param("subscription_id"))
 
-	userID, err := uuid.Parse(userIDStr)
-	if err != nil {
-		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id format"})
-		return
-	}
-
-	subscriptionID, err := uuid.Parse(subscriptionIDStr)
-	if err != nil {
-		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid subscription id format"})
+	if errU != nil || errS != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid id format"})
 		return
 	}
 
 	errMsg := h.subscriptionsService.DeleteSubscriptionByID(g.Request.Context(), userID, subscriptionID)
 	if errMsg != nil {
-		g.JSON(http.StatusInternalServerError, gin.H{"error": errMsg})
+		status := http.StatusInternalServerError
+		if errMsg.Error == "SUBSCRIPTION_NOT_FOUND" {
+			status = http.StatusNotFound
+		}
+		g.JSON(status, errMsg)
 		return
 	}
 
