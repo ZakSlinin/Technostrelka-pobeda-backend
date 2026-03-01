@@ -83,12 +83,6 @@ func (h *SubscriptionsHandler) GetAllUserByID(g *gin.Context) {
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id format"})
-	}
-
-	req := []model.Subscriptions{}
-
-	if err := g.ShouldBindJSON(&req); err != nil {
-		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
