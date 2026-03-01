@@ -17,7 +17,7 @@ func NewSubscriptionsHandler(subscriptionsService *service.SubscriptionsService)
 }
 
 func (h *SubscriptionsHandler) Create(g *gin.Context) {
-	userIDStr := g.Param("user_id")
+	userIDStr := g.GetHeader("X-User-Id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id format"})
@@ -40,8 +40,8 @@ func (h *SubscriptionsHandler) Create(g *gin.Context) {
 }
 
 func (h *SubscriptionsHandler) UpdateSubscriptionByID(g *gin.Context) {
-	userIDStr := g.Param("user_id")
-	subscriptionIDStr := g.Param("subscription_id")
+	userIDStr := g.GetHeader("X-User-Id")
+	subscriptionIDStr := g.Param("X-Subscription-Id")
 	userID, err := uuid.Parse(userIDStr)
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id format"})
