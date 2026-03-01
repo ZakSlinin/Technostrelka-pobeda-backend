@@ -50,7 +50,7 @@ func (r *PostgresSubscriptionsRepository) UpdateSubscriptionByID(ctx context.Con
 	return nil
 }
 
-func (r *PostgresSubscriptionsRepository) GetAllByUserID(ctx context.Context, userID string) ([]model.Subscriptions, error) {
+func (r *PostgresSubscriptionsRepository) GetAllByUserID(ctx context.Context, userID uuid.UUID) ([]model.Subscriptions, error) {
 	var subs []model.Subscriptions
 
 	result := r.db.WithContext(ctx).

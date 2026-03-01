@@ -12,7 +12,7 @@ type SubscriptionsService struct {
 	repo repository.SubscriptionsRepository
 }
 
-func NewSubscriptionsService(repo repository.SubscriptionsRepository) *SubscriptionsService {
+func NewSubscriptionsService(repo *repository.PostgresSubscriptionsRepository) *SubscriptionsService {
 	return &SubscriptionsService{
 		repo: repo,
 	}
