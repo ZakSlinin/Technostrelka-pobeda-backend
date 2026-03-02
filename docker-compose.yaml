@@ -4,6 +4,9 @@ services:
   subscriptions:
     build:
       context: ./subscriptions-service
+    restart: always
+    ports:
+      - "8080:8080"
     container_name: subscriptions_app
     depends_on:
       - db
@@ -23,8 +26,6 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    ports:
-      - "${DB_PORT}:5432"
     networks:
       - gzg-money-network
     volumes:

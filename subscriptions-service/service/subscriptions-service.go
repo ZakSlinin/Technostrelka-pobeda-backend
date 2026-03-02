@@ -47,7 +47,7 @@ func (s *SubscriptionsService) Create(ctx context.Context, userID uuid.UUID, sub
 		SubscriptionID:        subscriptionID,
 		UserID:                userID,
 		Name:                  sub.Name,
-		NextBilling:           sub.NextBilling,
+		NextBilling:           sub.NextBilling.Time,
 		Status:                sub.Status,
 		SubscriptionAvatarUrl: sub.SubscriptionsAvatarUrl,
 		Category:              sub.Category,
