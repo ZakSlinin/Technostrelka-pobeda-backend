@@ -20,63 +20,50 @@ components:
       properties:
         user_id:
           type: string
-          example: "550e8400-e29b-41d4-a716-446655440000"
+          format: uuid
         username:
           type: string
-          example: "timur_dev"
         fullname:
           type: string
-          example: "Iluha Dvauhovich"
         email:
           type: string
           format: email
-          example: "timur@example.com"
         avatar_url:
           type: string
-          description: URL to user avatar
         notifications:
           type: boolean
-          example: true
+
     Subscription:
       type: object
-      required: [subscription_id, user_id, name, cost, next_billing, status, subscription_avatar_url, category, url_service, use_in_this_month, cancellation_link]
+      required: [subscription_id, user_id, name, cost, next_billing, status]
       properties:
         subscription_id:
           type: string
-          example: "550e8400-e235b-4345d4-a716-81334554443210"
+          format: uuid
         user_id:
           type: string
-          example: "550e8400-e29b-41d4-a716-446655440000"
+          format: uuid
         name:
           type: string
-          example: timur_dev
         cost:
           type: number
-          format: float
-          example: 123.123
+          format: double
         next_billing:
           type: string
-          format: date-time
-          description: "Дата и время следующей оплаты в формате ISO 8601"
+          example: "2026-03-03"
         status:
-          type: string
-          example: paid/unpaid
+          type: boolean
         subscription_avatar_url:
           type: string
-          example: url/url/avsuburl.jpeg
+          nullable: true
         category:
           type: string
-          example: music
         url_service:
           type: string
-          example: url for some service
         use_in_this_month:
           type: boolean
-          example: true
         cancellation_link:
           type: string
-          example: link to cancellation service
-
 
     AuthTokens:
       type: object
@@ -84,17 +71,12 @@ components:
       properties:
         access_token:
           type: string
-          description: Short-lived JWT access token
         refresh_token:
           type: string
-          description: Long-lived JWT refresh token
         token_type:
           type: string
-          example: Bearer
         expires_in:
           type: integer
-          description: Access token lifetime in seconds
-          example: 900
 
     AuthResponse:
       type: object
@@ -107,63 +89,35 @@ components:
 
     Error:
       type: object
-      required: [error, message]
+      required: [error, message, timestamp]
       properties:
         error:
           type: string
-          example: "VALIDATION_ERROR"
         message:
           type: string
-          example: "Username already exists"
         timestamp:
-          type: string
-          format: date-time
+          $ref: '#/components/schemas/ProtoTimestamp'
+
+    ProtoTimestamp:
+      type: object
+      properties:
+        seconds:
+          type: integer
+        nanos:
+          type: integer
+
     ErrorUserNotFound:
-      type: object
-      required: [ error, message ]
-      properties:
-        error:
-          type: string
-          example: "USER_NOT_FOUND"
-        message:
-          type: string
-          example: "User not found"
-        timestamp:
-          type: string
-          format: date-time
+      $ref: '#/components/schemas/Error'
     ErrorInvalidCredentialForSearch:
-      type: object
-      required: [ error, message ]
-      properties:
-        error:
-          type: string
-          example: "INVALID_CREDENTIAL"
-        message:
-          type: string
-          example: "Invalid credential"
-        timestamp:
-          type: string
-          format: date-time
+      $ref: '#/components/schemas/Error'
     ErrorSubscriptionNotFound:
-      type: object
-      required: [ error, message ]
-      properties:
-        error:
-          type: string
-          example: "SUBSCRIPTION_NOT_FOUND"
-        message:
-          type: string
-          example: "Subscription not found"
-        timestamp:
-          type: string
-          format: date-time
+      $ref: '#/components/schemas/Error'
 
 paths:
   /api/user/register:
     post:
-      summary: Register new user with avatar
-      tags:
-        - Auth
+      summary: Register new user
+      tags: [ Auth ]
       requestBody:
         required: true
         content:
@@ -174,51 +128,27 @@ paths:
               properties:
                 username:
                   type: string
-                  minLength: 3
-                  maxLength: 32
-                  pattern: "^[a-zA-Z0-9_-]+$"
-                  description: Display username
-                  example: "timur_dev"
                 fullname:
                   type: string
-                  minLength: 3
-                  maxLength: 32
-                  pattern: "^[a-zA-Z0-9_-]+$"
-                  description: Display username
-                  example: "timur_dev"
                 email:
                   type: string
                   format: email
-                  description: User email
-                  example: "timur@example.com"
                 password:
                   type: string
                   format: password
-                  minLength: 8
-                  description: User password
-                  example: "SecurePass123!"
                 avatar:
                   type: string
                   format: binary
-                  description: User avatar file
                 notifications:
                   type: boolean
-                  example: true
       responses:
         '201':
-          description: User created successfully
+          description: Created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '400':
-          description: Invalid input data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '409':
-          description: Username or email already exists
           content:
             application/json:
               schema:
@@ -227,8 +157,7 @@ paths:
   /api/user/login:
     post:
       summary: Login user
-      tags:
-        - Auth
+      tags: [ Auth ]
       requestBody:
         required: true
         content:
@@ -239,173 +168,64 @@ paths:
               properties:
                 email:
                   type: string
-                  format: email
-                  example: "timur@example.com"
                 password:
                   type: string
-                  format: password
-                  example: "SecurePass123!"
       responses:
         '200':
-          description: Login successful
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
-        '400':
-          description: Invalid request body
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
         '401':
-          description: Invalid credentials
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+
   /api/user:
     get:
-      summary: Get current user info
-      tags:
-        - User
+      summary: Get user
+      tags: [ User ]
       security:
         - BearerToken: [ ]
       responses:
         '200':
-          description: User info retrieved successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        '401':
-          description: Unauthorized (JWT missing or invalid)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorInvalidCredentialForSearch'
         '404':
-          description: User not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorUserNotFound'
-  /api/user/delete:
-    delete:
-      summary: Delete user
-      tags:
-        - User
-      security:
-        - BearerToken: [ ]
-      responses:
-        '200':
-          description: User deleted successfully
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized (JWT missing or invalid)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorUserNotFound'
+
   /api/user/update:
     patch:
-      summary: Update some of field
-      tags:
-        - User
+      summary: Update user
+      tags: [ User ]
       security:
         - BearerToken: [ ]
-      parameters:
-        - name: user_id
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                name:
+                fullname:
                   type: string
-                  properties:
-                    name:
-                      type: string
-                      example: Seva
-                    avatar:
-                      type: string
-                      format: binary
-                      description: User avatar file
-                    email:
-                      type: string
-                      example: example@gmail.com
-                    notifications:
-                      type: boolean
-                      example: true
+                email:
+                  type: string
+                notifications:
+                  type: boolean
       responses:
         '200':
-          description: User updated successfully
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized (JWT missing or invalid)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorUserNotFound'
-
-
-  /api/user/refresh:
-    post:
-      summary: Refresh access token
-      tags: [ Auth ]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [ refresh_token ]
-              properties:
-                refresh_token:
-                  type: string
-      responses:
-        '200':
-          description: Tokens refreshed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthTokens'
-        '401':
-          description: Invalid refresh token
+          description: Updated
 
   /api/subscriptions/create:
     post:
       summary: Create subscription
-      tags:
-        - Subscriptions
+      tags: [ Subscriptions ]
       security:
         - BearerToken: [ ]
       requestBody:
@@ -414,136 +234,60 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - name
-                - cost
-                - next_billing
-                - status
-                - subscription_avatar
-                - category
-                - url_service
-                - use_in_this_month
+              required: [name, cost, next_billing, status]
               properties:
                 name:
                   type: string
-                  example: "yandex plus"
                 cost:
                   type: number
-                  format: float
-                  example: 150.54
                 next_billing:
                   type: string
-                  format: date-time
-                  description: "Дата и время следующей оплаты в формате ISO 8601"
                 status:
+                  type: boolean
+                subscription_avatar_url:
                   type: string
-                  example: unpaid
-                subscription_avatar:
-                  type: string
-                  format: binary
-                  description: User avatar file
                 category:
                   type: string
-                  example: music
                 url_service:
                   type: string
-                  example: url for some service
                 use_in_this_month:
                   type: boolean
-                  example: false
                 cancellation_link:
                   type: string
-                  example: link to cancellation service
-
       responses:
         '201':
-          description: Subscription created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  subscription_id:
-                    type: string
-                    example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-                  user_id:
-                    type: string
-                    example: "550e8400-e29b-41d4-a716-446655440000"
-                  name:
-                    type: string
-                    example: "yandex plus"
-                  cost:
-                    type: number
-                    format: float
-                    example: 150.54
-                  next_billing:
-                    type: string
-                    format: date-time
-                    description: "Дата и время следующей оплаты в формате ISO 8601"
-                  status:
-                    type: string
-                    example: unpaid
-                  subscription_avatar_url:
-                    type: string
-                    example: url/url/url/avatar.png
-                  category:
-                    type: string
-                    example: music
-                  url_service:
-                    type: string
-                    example: url for some service
-                  use_in_this_month:
-                    type: boolean
-                    example: false
-                  cancellation_link:
-                    type: string
-                    example: link to cancellation service
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized (JWT missing or invalid)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /api/subscriptions/get/subscriptions:
-    get:
-      summary: Get all user subscriptions
-      tags:
-        - Subscriptions
-      security:
-        - BearerToken: [ ]
-      responses:
-        '200':
-          description: Subscriptions retrieved successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscription'
-        '401':
-          description: Unauthorized (JWT missing or invalid)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorInvalidCredentialForSearch'
-        '404':
-          description: Subscriptions not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorSubscriptionNotFound'
 
-  /api/subscriptions/update:
+  /api/subscriptions/get/subscriptions:
+    get:
+      summary: Get subscriptions
+      tags: [ Subscriptions ]
+      security:
+        - BearerToken: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+
+  /api/subscriptions/update/{subscription_id}:
     patch:
-      summary: Update some of field
-      tags:
-        - Subscriptions
+      summary: Update subscription
+      tags: [ Subscriptions ]
       security:
         - BearerToken: []
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -552,58 +296,22 @@ paths:
               properties:
                 name:
                   type: string
-                  example: T-pro
                 cost:
                   type: number
-                  format: float
-                  example: 209.99
                 next_billing:
                   type: string
-                  format: date-time
-                  description: "Дата и время следующей оплаты в формате ISO 8601"
-                subscription_avatar:
-                  type: string
-                  format: binary
-                  description: User avatar file
+                status:
+                  type: boolean
                 category:
                   type: string
-                  example: cinema
-                url_service:
-                  type: string
-                  example: url of any service
-                use_in_this_month:
-                  type: boolean
-                  example: false
-                cancellation_link:
-                  type: string
-                  example: link to cancellation service
-
       responses:
         '200':
-          description: Subscription updated successfully
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized (JWT missing or invalid)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Subscriptions not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorSubscriptionNotFound'
+          description: Updated
+
   /api/subscriptions/delete/{subscription_id}:
     delete:
       summary: Delete subscription
-      tags:
-        - Subscriptions
+      tags: [ Subscriptions ]
       security:
         - BearerToken: [ ]
       parameters:
@@ -612,24 +320,10 @@ paths:
           required: true
           schema:
             type: string
-            example: "f47ac10b-58cc-4372-a567-0e02b2c3d479"
       responses:
         '200':
-          description: Subscription deleted successfully
-        '400':
-          description: Invalid request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '401':
-          description: Unauthorized (JWT missing or invalid)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          description: Deleted
         '404':
-          description: Subscriptions not found
           content:
             application/json:
               schema:
