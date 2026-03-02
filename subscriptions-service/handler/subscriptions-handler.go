@@ -104,7 +104,7 @@ func (h *SubscriptionsHandler) DeleteSubscriptionByID(g *gin.Context) {
 		return
 	}
 
-	errMsg := h.subscriptionsService.DeleteSubscriptionByID(g.Request.Context(), userID, subscriptionID)
+	errMsg := h.subscriptionsService.DeleteSubscriptionByID(g.Request.Context(), subscriptionID, userID)
 	if errMsg != nil {
 		status := http.StatusInternalServerError
 		if errMsg.Error == "SUBSCRIPTION_NOT_FOUND" {
