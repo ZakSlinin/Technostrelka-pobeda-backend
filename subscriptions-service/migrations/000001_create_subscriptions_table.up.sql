@@ -1,5 +1,5 @@
 CREATE TABLE subscriptions (
-    subscription_id UUID NOT NULL,
+    subscription_id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
 
     name TEXT NOT NULL,
@@ -13,11 +13,7 @@ CREATE TABLE subscriptions (
     category TEXT,
     url_service TEXT,
     use_in_this_month BOOLEAN,
-    cancellation_link TEXT,
-
-    FOREIGN KEY (user_id)
-       REFERENCES users(id)
-       ON DELETE CASCADE
+    cancellation_link TEXT
 );
 
 CREATE INDEX idx_subscriptions_user_id ON subscriptions(user_id);
