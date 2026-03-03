@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
+	"path/filepath"
 )
 
 type SubscriptionsHandler struct {
@@ -25,9 +26,23 @@ func (h *SubscriptionsHandler) Create(g *gin.Context) {
 	}
 
 	var req model.CreateSubscriptionRequest
-	if err := g.ShouldBindJSON(&req); err != nil {
+	if err := g.ShouldBind(&req); err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	file, err := g.FormFile("subscription_avatar")
+	if err == nil {
+		ext := filepath.Ext(file.Filename)
+		newFilename := uuid.New().String() + ext
+		dst := "/app/uploads/" + newFilename
+
+		if err := g.SaveUploadedFile(file, dst); err != nil {
+			g.JSON(http.StatusBadRequest, gin.H{"error": "failed to save uploaded file"})
+			return
+		}
+
+		req.SubscriptionAvatarUrl = "/uploads/" + newFilename
 	}
 
 	result, err := h.subscriptionsService.Create(g.Request.Context(), userID, &req)
@@ -55,9 +70,20 @@ func (h *SubscriptionsHandler) UpdateSubscriptionByID(g *gin.Context) {
 	}
 
 	var req model.UpdateSubscriptionRequest
-	if err := g.ShouldBindJSON(&req); err != nil {
+	if err := g.ShouldBind(&req); err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	file, err := g.FormFile("subscription_avatar")
+
+	if err == nil {
+		newFileName := uuid.New().String() + filepath.Ext(file.Filename)
+		dst := "/app/uploads/" + newFileName
+		if err := g.SaveUploadedFile(file, dst); err == nil {
+			path := "/uploads/" + newFileName
+			req.SubscriptionAvatarUrl = &path
+		}
 	}
 
 	errMsg := h.subscriptionsService.UpdateSubscriptionByID(g.Request.Context(), userID, subscriptionID, &req)

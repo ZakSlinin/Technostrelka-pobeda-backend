@@ -1,6 +1,17 @@
-version: '3.9'
-
 services:
+  nginx:
+    image: nginx:alpine
+    container_name: subscriptions_nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - uploads:/app/uploads
+    depends_on:
+      - subscriptions
+    networks:
+      - gzg-money-network
   subscriptions:
     build:
       context: ./subscriptions-service
@@ -16,6 +27,8 @@ services:
       - DB_HOST=db
       - DB_PORT=${DB_PORT}
       - DB_NAME=${DB_NAME}
+    volumes:
+      - uploads:/app/uploads
     networks:
       - gzg-money-network
 
@@ -94,3 +107,4 @@ networks:
     driver: bridge
 volumes:
   subs_db_data:
+  uploads:
