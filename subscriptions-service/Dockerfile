@@ -11,9 +11,13 @@ RUN go build -o main .
 
 FROM alpine:latest
 
+WORKDIR /app
+
 RUN apk --no-cache add ca-certificates
 
-WORKDIR /app
+RUN mkdir -p /app/uploads
+
+RUN chmod 777 /app/uploads
 
 COPY --from=builder /app/main .
 COPY --from=builder /app/migrations ./migrations
