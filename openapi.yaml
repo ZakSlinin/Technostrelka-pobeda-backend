@@ -53,9 +53,9 @@ components:
           example: "2026-03-03"
         status:
           type: boolean
-        subscription_avatar:
+        subscription_avatar_url:
           type: string
-          format: binary
+          example: "/uploads/41ab2ff8...png"
         category:
           type: string
         url_service:
@@ -332,3 +332,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorSubscriptionNotFound'
+  /api/subscriptions/{subscription_id}:
+    get:
+      summary: get subscription by id
+      tags: [ Subscriptions ]
+      security:
+        - BearerToken: [ ]
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
