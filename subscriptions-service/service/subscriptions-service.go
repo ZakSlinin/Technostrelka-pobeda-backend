@@ -119,3 +119,21 @@ func (s *SubscriptionsService) DeleteSubscriptionByID(ctx context.Context, id, u
 
 	return nil
 }
+
+func(s *SubscriptionsService) GetSubscriptionById(ctx context.Context, id, userID uuid.UUID) (*model.Subscriptions, *ErrorMessage) {
+		sub, err := s.repo.GetSubscriptionById(ctx, id, userID)
+
+		if err != nil {
+		 if err.Error() == "subscription not found" {
+				return nil, NewSubscriptionNotFound()
+		 }
+
+		return nil, &ErrorMessage{
+			Error:     "INTERNAL_ERROR",
+			Message:   err.Error(),
+			Timestamp: timestamppb.Now(),
+		}
+	}
+	
+	return sub, nil
+}
