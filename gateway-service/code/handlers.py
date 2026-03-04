@@ -176,7 +176,7 @@ async def get_subscription_handler(request):
 async def get_subavatar_handler(request):
 	file_name =request.match_info.get('file', "file.jpg")
 	async with aiohttp.ClientSession() as session:
-		async with session.get(f'http://{os.environ.get("subavatars_host")}/avatars/{file_name}') as response:
+		async with session.get(f'http://{os.environ.get("subavatars_host")}/uploads/{file_name}') as response:
 			return web.Response(body=await response.read(), \
 			headers={'Content-Disposition': f'attachment; filename={file_name}', 'Content-Type': 'application/octet-stream'})
 			
