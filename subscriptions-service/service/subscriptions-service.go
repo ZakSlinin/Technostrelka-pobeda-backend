@@ -47,6 +47,7 @@ func (s *SubscriptionsService) Create(ctx context.Context, userID uuid.UUID, sub
 		SubscriptionID:        subscriptionID,
 		UserID:                userID,
 		Name:                  sub.Name,
+		Cost:                  sub.Cost,
 		NextBilling:           sub.NextBilling,
 		Status:                sub.Status,
 		SubscriptionAvatarUrl: sub.SubscriptionAvatarUrl,
@@ -120,13 +121,13 @@ func (s *SubscriptionsService) DeleteSubscriptionByID(ctx context.Context, id, u
 	return nil
 }
 
-func(s *SubscriptionsService) GetSubscriptionById(ctx context.Context, id, userID uuid.UUID) (*model.Subscriptions, *ErrorMessage) {
-		sub, err := s.repo.GetSubscriptionById(ctx, id, userID)
+func (s *SubscriptionsService) GetSubscriptionById(ctx context.Context, id, userID uuid.UUID) (*model.Subscriptions, *ErrorMessage) {
+	sub, err := s.repo.GetBySubscriptionID(ctx, id, userID)
 
-		if err != nil {
-		 if err.Error() == "subscription not found" {
-				return nil, NewSubscriptionNotFound()
-		 }
+	if err != nil {
+		if err.Error() == "subscription not found" {
+			return nil, NewSubscriptionNotFound()
+		}
 
 		return nil, &ErrorMessage{
 			Error:     "INTERNAL_ERROR",
@@ -134,6 +135,6 @@ func(s *SubscriptionsService) GetSubscriptionById(ctx context.Context, id, userI
 			Timestamp: timestamppb.Now(),
 		}
 	}
-	
+
 	return sub, nil
 }
