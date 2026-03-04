@@ -89,11 +89,82 @@ async def get_avatar_handler(request):
 			
 		
 async def create_subscription_handler(request):
-	request_data = await request.json()
-	request_data = json.dumps(request_data)
+	request_data = FormData() 
+	reader = await request.multipart()
+	field = await reader.next()
+	while field:
+		if field.name == "name":
+			request_data.add_field("name", await field.text())
+		elif field.name == "cost":
+			request_data.add_field("cost", await field.text())
+		elif field.name == "next_billing":
+			request_data.add_field("next_billing", await field.text())
+		elif field.name == "status":
+			request_data.add_field("status", await field.text())
+		elif field.name == "subscription_avatar":
+			request_data.add_field("subscription_avatar", await field.read(), filename="image.jpg")
+		elif field.name == "category":
+			request_data.add_field("category", await field.text())
+		elif field.name == "url_service":
+			request_data.add_field("url_service", await field.text())
+		elif field.name == "use_in_this_month":
+			request_data.add_field("use_in_this_month", await field.text())
+		elif field.name == "cancellation_link":
+			request_data.add_field("cancellation_link", await field.text())
 	headers = {}
 	user_id = await get_user_id(request.headers)
-	headers["X-User-Id"] = dict(request.headers)["X-User-Id"]
+	headers["X-User-Id"] = user_id
 	async with aiohttp.ClientSession() as session:
-		async with session.post(f'http://{os.environ.get("subscriptions_host")}:8080/api/subscriptions/create', data=json.dumps(request_data), headers=headers) as response:
-			return web.json_response(await response.json(), status=200)
+		async with session.post(f'http://{os.environ.get("subscriptions_host")}:8080/api/subscriptions/create', data=request_data, headers=headers) as response:
+			return web.json_response(await response.json(), status=response.status)
+			
+
+async def update_subscription_handler(request):
+	request_data = FormData()
+	id = request.match_info.get('id', None) 
+	if not id:
+		web.json_response("subscription id is not provided", status=400)
+	reader = await request.multipart()
+	field = await reader.next()
+	while field:
+		if field.name == "name":
+			request_data.add_field("name", await field.text())
+		elif field.name == "cost":
+			request_data.add_field("cost", await field.text())
+		elif field.name == "next_billing":
+			request_data.add_field("next_billing", await field.text())
+		elif field.name == "status":
+			request_data.add_field("status", await field.text())
+		elif field.name == "subscription_avatar":
+			request_data.add_field("subscription_avatar", await field.read(), filename="image.jpg")
+		elif field.name == "category":
+			request_data.add_field("category", await field.text())
+		elif field.name == "url_service":
+			request_data.add_field("url_service", await field.text())
+		elif field.name == "use_in_this_month":
+			request_data.add_field("use_in_this_month", await field.text())
+		elif field.name == "cancellation_link":
+			request_data.add_field("cancellation_link", await field.text())
+	headers = {}
+	user_id = await get_user_id(request.headers)
+	headers["X-User-Id"] = user_id
+	async with aiohttp.ClientSession() as session:
+		async with session.patch(f'http://{os.environ.get("subscriptions_host")}:8080/api/subscriptions/update/{id}', data=request_data, headers=headers) as response:
+			return web.json_response(await response.json(), status=response.status)
+
+async def delete_subscription_handler(request):
+	id = request.match_info.get('id', None) 
+	if not id:
+		web.json_response("subscription id is not provided", status=response.status)
+	user_id = await get_user_id(request.headers)
+	headers["X-User-Id"] = user_id
+	async with aiohttp.ClientSession() as session:
+		async with session.delete(f'http://{os.environ.get("subscriptions_host")}:8080/api/subscriptions/delete/{id}', headers=headers) as response:
+			return web.json_response(await response.json(), status=response.status)
+			
+async def get_subscription_handler(request):
+	user_id = await get_user_id(request.headers)
+	headers["X-User-Id"] = user_id
+	async with aiohttp.ClientSession() as session:
+		async with session.get(f'http://{os.environ.get("subscriptions_host")}:8080/api/subscriptions/get/subscriptions', headers=headers) as response:
+			return web.json_response(await response.json(), status=response/status)
