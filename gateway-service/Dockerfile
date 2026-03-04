@@ -6,7 +6,7 @@ EXPOSE 8080
 
 RUN apt-get update
 RUN apt-get install python3 pip -y
-RUN pip install aiohttp aiohttp-cors
+RUN pip install aiohttp aiohttp-cors requests
 
 RUN adduser service-user
 USER service-user

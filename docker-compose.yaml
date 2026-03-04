@@ -4,7 +4,7 @@ services:
     container_name: subscriptions_nginx
     restart: always
     ports:
-      - "80:80"
+      - "8010:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - uploads:/app/uploads
@@ -16,8 +16,6 @@ services:
     build:
       context: ./subscriptions-service
     restart: always
-    ports:
-      - "8080:8080"
     container_name: subscriptions_app
     depends_on:
       - db
@@ -43,6 +41,7 @@ services:
       - gzg-money-network
     volumes:
       - subs_db_data:/var/lib/postgresql/data
+      
   swagger-ui:
     image: swaggerapi/swagger-ui
     container_name: gzg_money
@@ -58,8 +57,6 @@ services:
   user-service:
     build:
       context: ./user-service/
-    ports:
-      - "8088:8080"
     volumes:
       - ./user-service/backend:/backend
 
@@ -74,6 +71,8 @@ services:
 
     depends_on:
       - users-database     
+    networks:
+      - gzg-money-network
 
   gateway-service:
     build:
@@ -85,14 +84,16 @@ services:
     environment:
       - user_service_host=user-service
       - avatars_host=avatars
+      - subscriptions_host=subscriptions
+      - subavatars_host=nginx
+    networks:
+      - gzg-money-network
  
   avatars:
     build:
       context: ./user-service/backend/avatars/
     volumes:
       - ./user-service/backend/avatars/:/usr/share/nginx/html/avatars/
-    ports:
-     - "8040:80"
     environment:
      - NGINX_PORT=8040
       
@@ -102,6 +103,9 @@ services:
       - POSTGRES_DB=dbname
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=pass
+    networks:
+      - gzg-money-network
+      
 networks:
   gzg-money-network:
     driver: bridge
