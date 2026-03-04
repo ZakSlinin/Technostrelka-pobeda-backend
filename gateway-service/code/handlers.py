@@ -111,6 +111,7 @@ async def create_subscription_handler(request):
 			request_data.add_field("use_in_this_month", await field.text())
 		elif field.name == "cancellation_link":
 			request_data.add_field("cancellation_link", await field.text())
+		field = await reader.next()
 	headers = {}
 	user_id = await get_user_id(request.headers)
 	headers["X-User-Id"] = user_id
@@ -145,6 +146,7 @@ async def update_subscription_handler(request):
 			request_data.add_field("use_in_this_month", await field.text())
 		elif field.name == "cancellation_link":
 			request_data.add_field("cancellation_link", await field.text())
+		field = await reader.next()
 	headers = {}
 	user_id = await get_user_id(request.headers)
 	headers["X-User-Id"] = user_id
@@ -153,6 +155,7 @@ async def update_subscription_handler(request):
 			return web.json_response(await response.json(), status=response.status)
 
 async def delete_subscription_handler(request):
+	headers = {}
 	id = request.match_info.get('id', None) 
 	if not id:
 		web.json_response("subscription id is not provided", status=response.status)
@@ -163,11 +166,12 @@ async def delete_subscription_handler(request):
 			return web.json_response(await response.json(), status=response.status)
 			
 async def get_subscription_handler(request):
+	headers = {}
 	user_id = await get_user_id(request.headers)
 	headers["X-User-Id"] = user_id
 	async with aiohttp.ClientSession() as session:
-		async with session.get(f'http://{os.environ.get("subscriptions_host")}:8080/api/subscriptions/get/subscriptions', headers=headers) as response:
-			return web.json_response(await response.json(), status=response/status)
+		async with session.get(f'http://{os.environ.get("subscriptions_host")}:8080/api/subscriptions/all', headers=headers) as response:
+			return web.json_response(await response.json(), status=response.status)
 
 async def get_subavatar_handler(request):
 	file_name =request.match_info.get('file', "file.jpg")
@@ -175,3 +179,13 @@ async def get_subavatar_handler(request):
 		async with session.get(f'http://{os.environ.get("subavatars_host")}/avatars/{file_name}') as response:
 			return web.Response(body=await response.read(), \
 			headers={'Content-Disposition': f'attachment; filename={file_name}', 'Content-Type': 'application/octet-stream'})
+			
+async def getid_subscription_handler(request):
+	id = request.match_info.get('id', None) 
+	headers = {}
+	user_id = await get_user_id(request.headers)
+	headers["X-User-Id"] = user_id
+	async with aiohttp.ClientSession() as session:
+		async with session.get(f'http://{os.environ.get("subscriptions_host")}:8080/api/subscriptions/{id}', headers=headers) as response:
+			return web.json_response(await response.json(), status=response.status)
+
