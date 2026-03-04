@@ -335,8 +335,7 @@ paths:
   /api/subscriptions/{subscription_id}:
     get:
       summary: get subscription by id
-      tags:
-        - [ Subscriptions ]
+      tags: [ Subscriptions ]
       security:
         - BearerToken: [ ]
       parameters:
