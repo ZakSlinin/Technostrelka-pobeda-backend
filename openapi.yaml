@@ -336,7 +336,7 @@ paths:
     get:
       summary: get subscription by id
       tags:
-        - subscriptions
+        - [ Subscriptions ]
       security:
         - BearerToken: [ ]
       parameters:
