@@ -37,5 +37,7 @@ resource = cors.add(app.router.add_resource("/api/subscriptions/delete/{id}"))
 cors.add(resource.add_route("DELETE", handlers.delete_subscription_handler))
 resource = cors.add(app.router.add_resource("/api/subscriptions/get/subscriptions"))
 cors.add(resource.add_route("GET", handlers.get_subscription_handler))
+resource = cors.add(app.router.add_resource("/avatars/{file}"))
+cors.add(resource.add_route("GET", handlers.get_avatar_handler))
 
 web.run_app(app, host="0.0.0.0", port=8080)
