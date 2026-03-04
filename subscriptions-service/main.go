@@ -52,12 +52,16 @@ func main() {
 	handler := handler.NewSubscriptionsHandler(service)
 
 	r := gin.Default()
+
+	r.Static("/uploads", "/app/uploads")
+
 	api := r.Group("/api/subscriptions")
 	{
 		api.POST("/create", handler.Create)
 		api.GET("/all", handler.GetAllUserByID)
-		api.POST("/update/:subscription_id", handler.UpdateSubscriptionByID)
+		api.PATCH("/update/:subscription_id", handler.UpdateSubscriptionByID)
 		api.DELETE("/delete/:subscription_id", handler.DeleteSubscriptionByID)
+		api.GET("/subscription/:subscription_id", handler.GetSubscriptionByID)
 	}
 
 	r.Run(":8080")

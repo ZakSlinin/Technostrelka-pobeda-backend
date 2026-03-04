@@ -82,3 +82,20 @@ func (r *PostgresSubscriptionsRepository) Delete(ctx context.Context, id, userID
 
 	return nil
 }
+
+func (r *PostgresSubscriptionsRepository) GetBySubscriptionID(ctx context.Context, subscriptionId, userId uuid.UUID) (*model.Subscriptions, error) {
+	var sub *model.Subscriptions
+
+	result := r.db.WithContext(ctx).
+		Where("subscriptions_id = ? user_id = ?", subscriptionId, userId).
+		Find(&sub)
+
+	if result.Error != nil {
+		if result.RowsAffected == 0 {
+			return nil, errors.New("subscriptions not found")
+		}
+		return nil, fmt.Errorf("failed to fetch subscription: %w", result.Error)
+	}
+
+	return sub, nil
+}

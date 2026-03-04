@@ -53,9 +53,9 @@ components:
           example: "2026-03-03"
         status:
           type: boolean
-        subscription_avatar_url:
+        subscription_avatar:
           type: string
-          nullable: true
+          format: binary
         category:
           type: string
         url_service:
@@ -231,7 +231,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               required: [name, cost, next_billing, status]
@@ -244,8 +244,9 @@ paths:
                   type: string
                 status:
                   type: boolean
-                subscription_avatar_url:
+                subscription_avatar:
                   type: string
+                  format: binary
                 category:
                   type: string
                 url_service:
@@ -290,7 +291,7 @@ paths:
             type: string
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -302,6 +303,9 @@ paths:
                   type: string
                 status:
                   type: boolean
+                subscription_avatar:
+                  type: string
+                  format: binary
                 category:
                   type: string
       responses:

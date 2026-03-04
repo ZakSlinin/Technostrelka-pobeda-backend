@@ -4,7 +4,6 @@ package model
 
 import (
 	"fmt"
-	"strings"
 	"time"
 )
 
@@ -20,9 +19,9 @@ var layouts = []string{
 	time.RFC3339,               // Стандарт Go
 }
 
-func (t *ISO8601Time) UnmarshalJSON(b []byte) error {
-	s := strings.Trim(string(b), "\"") // Убираем кавычки JSON
-	if s == "null" || s == "" {
+func (t *ISO8601Time) UnmarshalText(text []byte) error {
+	s := string(text)
+	if s == "" || s == "null" {
 		return nil
 	}
 
@@ -35,5 +34,5 @@ func (t *ISO8601Time) UnmarshalJSON(b []byte) error {
 		}
 		lastErr = err
 	}
-	return fmt.Errorf("неверный формат даты: %s. Ожидается YYYY-MM-DD или ISO8601. Ошибка: %v", s, lastErr)
+	return fmt.Errorf("invalid date format in form: %s", lastErr)
 }
