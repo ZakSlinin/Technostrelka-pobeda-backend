@@ -28,7 +28,7 @@ services:
       - DB_PORT=${DB_PORT}
       - DB_NAME=${DB_NAME}
     volumes:
-      - uploads:/app/uploads
+      - ./subscriptions-service/uploads:/app/uploads
     networks:
       - gzg-money-network
 
