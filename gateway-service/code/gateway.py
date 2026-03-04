@@ -29,6 +29,7 @@ resource = cors.add(app.router.add_resource("/api/user/update"))
 cors.add(resource.add_route("PATCH", handlers.user_update_handler))
 resource = cors.add(app.router.add_resource("/avatars/{file}"))
 cors.add(resource.add_route("GET", handlers.get_avatar_handler))
-
+resource = cors.add(app.router.add_resource("/api/subscriptions/create"))
+cors.add(resource.add_route("POST", handlers.create_subscription_handler))
 
 web.run_app(app, host="0.0.0.0", port=8080)

@@ -1,8 +1,16 @@
 import aiohttp
 import os
+import uuid
 import asyncio
 from aiohttp import web
 from aiohttp import FormData
+import json
+
+async def get_user_id(headers):
+	async with aiohttp.ClientSession() as session:
+        		async with session.get(f'http://{os.environ.get("user_service_host")}:8080/api/user', headers=headers) as response:
+        			data = await response.json()
+        			return data["user"]["id"]
 
 
 async def user_get_handler(request):
@@ -78,3 +86,14 @@ async def get_avatar_handler(request):
 		async with session.get(f'http://{os.environ.get("avatars_host")}/avatars/{file_name}') as response:
 			return web.Response(body=await response.read(), \
 			headers={'Content-Disposition': f'attachment; filename={file_name}', 'Content-Type': 'application/octet-stream'})
+			
+		
+async def create_subscription_handler(request):
+	request_data = await request.json()
+	request_data = json.dumps(request_data)
+	headers = {}
+	user_id = await get_user_id(request.headers)
+	headers["X-User-Id"] = dict(request.headers)["X-User-Id"]
+	async with aiohttp.ClientSession() as session:
+		async with session.post(f'http://{os.environ.get("subscriptions_host")}:8080/api/subscriptions/create', data=json.dumps(request_data), headers=headers) as response:
+			return web.json_response(await response.json(), status=200)
