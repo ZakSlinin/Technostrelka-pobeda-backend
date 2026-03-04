@@ -14,6 +14,7 @@ type SubscriptionsRepository interface {
 	UpdateSubscriptionByID(ctx context.Context, id, userID uuid.UUID, req *model.UpdateSubscriptionRequest) error
 	GetAllByUserID(ctx context.Context, userID uuid.UUID) ([]model.Subscriptions, error)
 	Delete(ctx context.Context, id, userID uuid.UUID) error
+	GetBySubscriptionID(ctx context.Context, id, userID uuid.UUID) (*model.Subscriptions, error)
 }
 
 type PostgresSubscriptionsRepository struct {
@@ -84,18 +85,18 @@ func (r *PostgresSubscriptionsRepository) Delete(ctx context.Context, id, userID
 }
 
 func (r *PostgresSubscriptionsRepository) GetBySubscriptionID(ctx context.Context, subscriptionId, userId uuid.UUID) (*model.Subscriptions, error) {
-	var sub *model.Subscriptions
+	var sub model.Subscriptions
 
 	result := r.db.WithContext(ctx).
-		Where("subscriptions_id = ? user_id = ?", subscriptionId, userId).
-		Find(&sub)
+		Where("subscription_id = ? and user_id = ?", subscriptionId, userId).
+		First(&sub)
 
 	if result.Error != nil {
-		if result.RowsAffected == 0 {
-			return nil, errors.New("subscriptions not found")
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, errors.New("subscription not found")
 		}
 		return nil, fmt.Errorf("failed to fetch subscription: %w", result.Error)
 	}
 
-	return sub, nil
+	return &sub, nil
 }

@@ -61,7 +61,7 @@ func main() {
 		api.GET("/all", handler.GetAllUserByID)
 		api.PATCH("/update/:subscription_id", handler.UpdateSubscriptionByID)
 		api.DELETE("/delete/:subscription_id", handler.DeleteSubscriptionByID)
-		api.GET("/subscription/:subscription_id", handler.GetSubscriptionByID)
+		api.GET(":subscription_id", handler.GetSubscriptionByID)
 	}
 
 	r.Run(":8080")

@@ -151,7 +151,7 @@ func (h *SubscriptionsHandler) GetSubscriptionByID(g *gin.Context) {
 	}
 
 	subID, err := uuid.Parse(g.Param("subscription_id"))
- if err != nil {
+	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid subscription id format"})
 		return
 	}
