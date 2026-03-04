@@ -332,3 +332,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorSubscriptionNotFound'
+  /api/subscriptions/{subscription_id}:
+    get:
+      summary: get subscription by id
+      tags:
+        - subscriptions
+      security:
+        - BearerToken: [ ]
+      parameters:
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
