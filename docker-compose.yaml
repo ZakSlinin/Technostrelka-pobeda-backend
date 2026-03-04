@@ -96,6 +96,8 @@ services:
       - ./user-service/backend/avatars/:/usr/share/nginx/html/avatars/
     environment:
      - NGINX_PORT=8040
+    networks:
+      - gzg-money-network
       
   users-database:
     image: postgres:17.2-alpine3.21
