@@ -53,9 +53,9 @@ components:
           example: "2026-03-03"
         status:
           type: boolean
-        subscription_avatar:
+        subscription_avatar_url:
           type: string
-          format: binary
+          example: "/uploads/41ab2ff8...png"
         category:
           type: string
         url_service:
