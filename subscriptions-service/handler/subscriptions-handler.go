@@ -142,3 +142,26 @@ func (h *SubscriptionsHandler) DeleteSubscriptionByID(g *gin.Context) {
 
 	g.JSON(http.StatusOK, gin.H{"message": "subscription deleted successfully"})
 }
+
+func (h *SubscriptionsHandler) GetSubscriptionByID(g *gin.Context) {
+	userID, err := uuid.Parse(g.GetHeader("X-User-Id"))
+	if err != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid user id format"})
+		return
+	}
+
+	subID, err := uuid.Parse(g.Param("subscription_id"))
+ if err != nil {
+		g.JSON(http.StatusBadRequest, gin.H{"error": "invalid subscription id format"})
+		return
+	}
+
+	result, errMsg := h.subscriptionsService.GetSubscriptionById(g.Request.Context(), subID, userID)
+
+	if errMsg != nil {
+		g.JSON(http.StatusInternalServerError, errMsg)
+		return
+	}
+
+	g.JSON(http.StatusOK, result)
+}
