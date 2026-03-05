@@ -102,7 +102,7 @@ async def create_subscription_handler(request):
 		elif field.name == "status":
 			request_data.add_field("status", await field.text())
 		elif field.name == "subscription_avatar":
-			request_data.add_field("subscription_avatar", await field.read(), filename="image.jpg")
+			request_data.add_field("subscription_avatar", await field.read())
 		elif field.name == "category":
 			request_data.add_field("category", await field.text())
 		elif field.name == "url_service":
@@ -137,7 +137,7 @@ async def update_subscription_handler(request):
 		elif field.name == "status":
 			request_data.add_field("status", await field.text())
 		elif field.name == "subscription_avatar":
-			request_data.add_field("subscription_avatar", await field.read(), filename="image.jpg")
+			request_data.add_field("subscription_avatar", await field.read())
 		elif field.name == "category":
 			request_data.add_field("category", await field.text())
 		elif field.name == "url_service":
