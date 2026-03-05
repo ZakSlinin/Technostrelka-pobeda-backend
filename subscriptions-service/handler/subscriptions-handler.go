@@ -5,7 +5,9 @@ import (
 	"github.com/ZakSlinin/Technostrelka-pobeda-backend/subscriptions-service/service"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"io"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
@@ -33,12 +35,26 @@ func (h *SubscriptionsHandler) Create(g *gin.Context) {
 
 	file, err := g.FormFile("subscription_avatar")
 	if err == nil {
+		openedFile, err := file.Open()
+		if err != nil {
+			g.JSON(http.StatusInternalServerError, gin.H{"error": "failed to open file"})
+			return
+		}
+		defer openedFile.Close()
+
+		fileBytes, err := io.ReadAll(openedFile)
+		if err != nil {
+			g.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
+			return
+		}
+
 		ext := filepath.Ext(file.Filename)
 		newFilename := uuid.New().String() + ext
 		dst := "/app/uploads/" + newFilename
 
-		if err := g.SaveUploadedFile(file, dst); err != nil {
-			g.JSON(http.StatusBadRequest, gin.H{"error": "failed to save uploaded file"})
+		err = os.WriteFile(dst, fileBytes, 0644)
+		if err != nil {
+			g.JSON(http.StatusInternalServerError, gin.H{"error": "failed to write file"})
 			return
 		}
 
