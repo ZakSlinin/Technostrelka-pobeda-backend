@@ -262,7 +262,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Subscription'
 
-  /api/subscriptions/get/subscriptions:
+  /api/subscriptions/all:
     get:
       summary: Get subscriptions
       tags: [ Subscriptions ]
