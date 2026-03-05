@@ -7,7 +7,7 @@ services:
       - "8010:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - uploads:/app/uploads
+      - ./subscriptions-service/uploads:/app/uploads
     depends_on:
       - subscriptions
     networks:
