@@ -15,10 +15,6 @@ WORKDIR /app
 
 RUN apk --no-cache add ca-certificates
 
-RUN mkdir -p /app/uploads
-
-RUN chmod 777 /app/uploads
-
 COPY --from=builder /app/main .
 COPY --from=builder /app/migrations ./migrations
 

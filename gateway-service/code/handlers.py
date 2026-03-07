@@ -16,8 +16,7 @@ async def get_user_id(headers):
 async def user_get_handler(request):
 	async with aiohttp.ClientSession() as session:
         		async with session.get(f'http://{os.environ.get("user_service_host")}:8080/api/user', headers=request.headers) as response:
-        			data = await response.json()
-        			return web.json_response(data, status=response.status)
+        			return web.json_response(await response.json(), status=response.status)
 			
 			
 async def user_register_handler(request):
@@ -35,6 +34,8 @@ async def user_register_handler(request):
 			request_data.add_field('password',  await field.text())
 		elif field.name == 'avatar':
 			request_data.add_field('avatar',  await field.read(),  filename='image.jpg')
+		elif field.name == 'notifications':
+			request_data.add_field('notifications',  await field.text())
 		field = await reader.next()
 				
 	async with aiohttp.ClientSession() as session:
@@ -44,17 +45,17 @@ async def user_register_handler(request):
 async def user_login_handler(request):
 	async with aiohttp.ClientSession() as session:
 		async with session.post(f'http://{os.environ.get("user_service_host")}:8080/api/user/login', data=await request.json()) as response:
-			return web.json_response(await response.json(), status=200)
+			return web.json_response(await response.json(), status=response.status)
 			
 async def refresh_token_handler(request):
 	async with aiohttp.ClientSession() as session:
 		async with session.post(f'http://{os.environ.get("user_service_host")}:8080/api/user/refresh', data=await request.json()) as response:
-			return web.json_response(await response.json(), status=200)
+			return web.json_response(await response.json(), status=response.status)
 			
 async def user_delete_handler(request):
 	async with aiohttp.ClientSession() as session:
 		async with session.delete(f'http://{os.environ.get("user_service_host")}:8080/api/user/delete', headers=request.headers) as response:
-			return web.json_response(await response.json(), status=200)
+			return web.json_response(await response.json(), status=response.status)
 
 async def user_update_handler(request):
 	reader = await request.multipart()
@@ -73,6 +74,10 @@ async def user_update_handler(request):
 			request_data.add_field('password',  await field.text())
 		elif field.name == 'avatar':
 			request_data.add_field('avatar',  await field.read(),  filename='image.jpg')
+		elif field.name == 'notifications':
+			request_data.add_field('notifications',  await field.text())
+		else:
+			web.json(f"Undefined field: {field.name}", status=400)
 		field = await reader.next()
 				
 	async with aiohttp.ClientSession() as session:
