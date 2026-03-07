@@ -11,7 +11,10 @@ from .models import User
 @api_view(['POST'])
 @authentication_classes(())
 def user_login(request, *args, **kwargs):
-	user = User.objects.get(email=request.data["email"])
+	try:
+		user = User.objects.get(email=request.data["email"])
+	except Exception as e:
+		return Response("No such user", status=401)
 	token = RefreshToken.for_user(user)
 	res_obj = {
 		"user": {
@@ -20,6 +23,7 @@ def user_login(request, *args, **kwargs):
 		"fullname": str(user.fullname),
 		"email": str(user.email),
 		"avatar_url": str(user.avatar),
+		"notifications": user.notifications,
 		},
 		"tokens": {
 		"acces_token": str(token.access_token),
@@ -45,6 +49,7 @@ class UserRegisterView(CreateAPIView):
 			"fullname": str(user.fullname),
 			"email": str(user.email),
 			"avatar_url": str(user.avatar),
+			"notifications": user.notifications,
 			},
 			"tokens": {
 			"acces_token": str(token.access_token),
@@ -58,7 +63,9 @@ class UserRegisterView(CreateAPIView):
 
 @api_view(['GET'])
 def get_user(request, *args, **kwargs):
-	user =  request.user 
+	user =  request.user
+	if not user.username:
+		return Response("Not authorized", status=401) 
 	res_obj = {
 		"user": {
 		"id": str(user.user_id),
@@ -66,6 +73,7 @@ def get_user(request, *args, **kwargs):
 		"fullname": str(user.fullname),
 		"email": str(user.email),
 		"avatar_url": str(user.avatar),
+		"notifications": user.notifications,
 		}}
 	return Response(res_obj, status=200)
 
@@ -89,6 +97,8 @@ def update_user(request, *args, **kwargs):
 		user.fullname = request.data["fullname"]
 	if request.data["id"]:
 		user.user_id = request.data["id"]
+	if request.data["notifications"]:
+		user.notifications = request.data["notifications"]
 	if request.data["avatar"]:
 		user.avatar = request.data["avatar"]
 	user.save()
@@ -100,6 +110,7 @@ def update_user(request, *args, **kwargs):
 	"fullname": str(user.fullname),
 	"email": str(user.email),
 	"avatar_url": str(user.avatar),
+	"notifications": user.notifications,
 	}}
 	return Response("User updated successfully", status=200)
 
