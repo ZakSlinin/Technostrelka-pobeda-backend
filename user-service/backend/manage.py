@@ -1,7 +1,9 @@
 #!/usr/bin/python3
 """Django's command-line utility for administrative tasks."""
+from user.notiffications import notify
 import os
 import sys
+from multiprocessing import Process
 
 
 def main():
@@ -15,7 +17,11 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+    if  sys.argv[1] =="runserver":
+        p = Process(target=notify)
+        p.start()
     execute_from_command_line(sys.argv)
+    
 
 
 if __name__ == '__main__':

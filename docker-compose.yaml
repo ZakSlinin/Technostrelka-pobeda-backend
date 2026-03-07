@@ -65,6 +65,8 @@ services:
       - DB_NAME=dbname
       - DB_USER=dbuser
       - DB_PASS=pass
+      - EMAIL= ${EMAIL}
+      - EMAIL_PASS= ${EMAIL_PASS}
 
     command: >
       sh -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8080"
