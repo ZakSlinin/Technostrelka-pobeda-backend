@@ -1,4 +1,4 @@
-from rest_framework.serializers import Serializer, ModelSerializer, CharField, UUIDField, BooleanField, IntegerField
+from rest_framework.serializers import Serializer, ModelSerializer, CharField, UUIDField, BooleanField, IntegerField, FileField
 from .models import User
 
 
@@ -18,9 +18,10 @@ class UserUpdateSerializer(ModelSerializer):
 	username = CharField(max_length=300, required=False)
 	fullname = CharField(max_length=100, required=False)
 	notifications = BooleanField(required=False)
+	avatar = FileField(required=False)
 	
 	class Meta:
 		model = User
-		fields = "__all__"
+		fields = ("password", "username", "id", "fullname", "notifications", "email", "avatar")
 		
 		
