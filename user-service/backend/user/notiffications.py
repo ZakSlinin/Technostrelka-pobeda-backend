@@ -12,7 +12,7 @@ def notify():
 	while True:
 			for user in User.objects.all():
 				if user.notifications:
-					header = {"X-User-Id": str(user.user_id)}
+					header = {"X-User-Id": str(user.id)}
 					response = requests.get("http://subscriptions:8080/api/subscriptions/all", headers=header)
 					subscriptions = response.json()
 					if len(subscriptions) == 0:

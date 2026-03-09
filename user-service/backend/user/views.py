@@ -14,8 +14,11 @@ def user_login(request):
 		return Response("No such user", status=401)
 	user_serializer = UserSerializer(user)
 	token = RefreshToken.for_user(user)
+	user_data = dict(user_serializer.data)
+	user_data["avatar_url"] = user_data["avatar"]
+	user_data.pop("avatar")
 	res_obj = {
-		"user": user_serializer.data,
+		"user": user_data,
 		"tokens": {
 		"acces_token": str(token.access_token),
 		"refresh_token": str(token),
@@ -34,8 +37,11 @@ def user_registration(request):
 	else:
 		return Response(serializer.errors, status=400)
 	token = RefreshToken.for_user(user)
+	user_data = dict(serializer.data)
+	user_data["avatar_url"] = user_data["avatar"]
+	user_data.pop("avatar")
 	res_obj = {
-		"user": serializer.data,
+		"user": user_data,
 		"tokens": {
 		"acces_token": str(token.access_token),
 		"refresh_token": str(token),
@@ -51,7 +57,10 @@ def get_user(request):
 	if not user.username:
 		return Response("Not authorized", status=401) 
 	serializer = UserSerializer(user)
-	return Response({"user": serializer.data}, status=200)
+	user_data = dict(serializer.data)
+	user_data["avatar_url"] = user_data["avatar"]
+	user_data.pop("avatar")
+	return Response({"user": user_data}, status=200)
 	
 	
 
