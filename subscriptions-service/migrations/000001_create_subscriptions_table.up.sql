@@ -5,7 +5,7 @@ CREATE TABLE subscriptions (
     name TEXT NOT NULL,
     cost NUMERIC(10,2) NOT NULL CHECK (cost >= 0),
 
-    next_billing TIMESTAMP NOT NULL,
+    next_billing TEXT NOT NULL,
 
     status BOOLEAN,
 
