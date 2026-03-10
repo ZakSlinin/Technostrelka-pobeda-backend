@@ -75,6 +75,29 @@ services:
       - users-database     
     networks:
       - gzg-money-network
+      
+  notify-service:
+    build:
+      context: ./user-service/
+    volumes:
+      - ./user-service/backend:/backend
+
+    environment:
+      - DB_HOST=users-database
+      - DB_NAME=dbname
+      - DB_USER=dbuser
+      - DB_PASS=pass
+      - EMAIL= ${EMAIL}
+      - EMAIL_PASS= ${EMAIL_PASS}
+
+    command: >
+      sh -c "python3 ./notiffications.py"
+
+    depends_on:
+      - users-database  
+      - user-service   
+    networks:
+      - gzg-money-network
 
   gateway-service:
     build:
