@@ -36,6 +36,8 @@ async def user_register_handler(request):
 			request_data.add_field('avatar',  await field.read(),  filename='image.jpg')
 		elif field.name == 'notifications':
 			request_data.add_field('notifications',  await field.text())
+		elif field.name == 'is_connected_email':
+			request_data.add_field('is_connected_email',  await field.text())
 		field = await reader.next()
 				
 	async with aiohttp.ClientSession() as session:
@@ -76,6 +78,8 @@ async def user_update_handler(request):
 			request_data.add_field('avatar',  await field.read(),  filename='image.jpg')
 		elif field.name == 'notifications':
 			request_data.add_field('notifications',  await field.text())
+		elif field.name == 'is_connected_email':
+			request_data.add_field('is_connected_email',  await field.text())
 		else:
 			web.json(f"Undefined field: {field.name}", status=400)
 		field = await reader.next()
