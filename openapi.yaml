@@ -64,6 +64,17 @@ components:
           type: boolean
         cancellation_link:
           type: string
+    Email:
+      type: object
+      required: [ username, password ]
+      properties:
+        username:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
 
     AuthTokens:
       type: object
@@ -350,3 +361,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscription'
+
+  /api/email/parse:
+    post:
+      summary: Parse email for subscriptions
+      tags: [ Email ]
+      security:
+        - BearerToken: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Email'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+        '422':
+          description: Cannot connect to IMAP server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInvalidCredentialForSearch'
