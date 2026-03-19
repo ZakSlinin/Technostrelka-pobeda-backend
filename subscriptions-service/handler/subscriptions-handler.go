@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
 type SubscriptionsHandler struct {
@@ -86,9 +87,52 @@ func (h *SubscriptionsHandler) UpdateSubscriptionByID(g *gin.Context) {
 	}
 
 	var req model.UpdateSubscriptionRequest
-	if err := g.ShouldBind(&req); err != nil {
-		g.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+
+	if v, ok := g.GetPostForm("name"); ok {
+		req.Name = &v
+	}
+
+	if v, ok := g.GetPostForm("category"); ok {
+		req.Category = &v
+	}
+
+	if v, ok := g.GetPostForm("url_service"); ok {
+		req.UrlService = &v
+	}
+
+	if v, ok := g.GetPostForm("next_billing"); ok {
+		req.NextBilling = &v
+	}
+
+	if v, ok := g.GetPostForm("cancellation_link"); ok {
+		req.CancellationLink = &v
+	}
+
+	if v, ok := g.GetPostForm("cost"); ok {
+		cost, err := strconv.ParseFloat(v, 64)
+		if err != nil {
+			g.JSON(http.StatusBadRequest, gin.H{"error": "invalid cost"})
+			return
+		}
+		req.Cost = &cost
+	}
+
+	if v, ok := g.GetPostForm("status"); ok {
+		status, err := strconv.ParseBool(v)
+		if err != nil {
+			g.JSON(http.StatusBadRequest, gin.H{"error": "invalid status"})
+			return
+		}
+		req.Status = &status
+	}
+
+	if v, ok := g.GetPostForm("use_in_this_month"); ok {
+		use, err := strconv.ParseBool(v)
+		if err != nil {
+			g.JSON(http.StatusBadRequest, gin.H{"error": "invalid use_in_this_month"})
+			return
+		}
+		req.UseInThisMonth = &use
 	}
 
 	file, err := g.FormFile("subscription_avatar")
