@@ -138,11 +138,27 @@ func (h *SubscriptionsHandler) UpdateSubscriptionByID(g *gin.Context) {
 	file, err := g.FormFile("subscription_avatar")
 
 	if err == nil {
-		newFileName := uuid.New().String() + filepath.Ext(file.Filename)
-		dst := "/app/uploads/" + newFileName
-		if err := g.SaveUploadedFile(file, dst); err == nil {
-			path := "/uploads/" + newFileName
-			req.SubscriptionAvatarUrl = &path
+		openedFile, err := file.Open()
+		if err != nil {
+			g.JSON(http.StatusInternalServerError, gin.H{"error": "failed to open file"})
+			return
+		}
+		defer openedFile.Close()
+
+		fileBytes, err := io.ReadAll(openedFile)
+		if err != nil {
+			g.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read file"})
+			return
+		}
+
+		ext := filepath.Ext(file.Filename)
+		newFilename := uuid.New().String() + ext
+		dst := "/app/uploads/" + newFilename
+
+		err = os.WriteFile(dst, fileBytes, 0644)
+		if err != nil {
+			g.JSON(http.StatusInternalServerError, gin.H{"error": "failed to write file"})
+			return
 		}
 	}
 
