@@ -160,6 +160,9 @@ func (h *SubscriptionsHandler) UpdateSubscriptionByID(g *gin.Context) {
 			g.JSON(http.StatusInternalServerError, gin.H{"error": "failed to write file"})
 			return
 		}
+		
+		SubscriptionAvatarUrl := "/uploads/" + newFilename
+		req.SubscriptionAvatarUrl = &SubscriptionAvatarUrl
 	}
 
 	errMsg := h.subscriptionsService.UpdateSubscriptionByID(g.Request.Context(), userID, subscriptionID, &req)
