@@ -44,7 +44,7 @@ def notify():
 						now = datetime.datetime.now()
 						delta = nb_date - now
 						if delta.days == 1 or delta.days == 0:
-							text = f"Здравствуйте, {user.username}, напоминаем вам о предстоящем списании по подписке {sub["name"]}: {sub["url_service"]}"
+							text = f"Здравствуйте, {user.username}, напоминаем вам о предстоящем списании по подписке {sub["name"]}  Ссылкаа на сервис: {sub["url_service"]} Если вы хотите отменить подписку: {sub["cancellation_link"]}"
 							send_mail(f"Наипоминание о списании по подписке {sub["name"]}",
 							text,
 							settings.DEFAULT_FROM_EMAIL,
