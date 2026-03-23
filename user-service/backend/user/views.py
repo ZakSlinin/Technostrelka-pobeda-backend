@@ -9,7 +9,7 @@ from .models import User
 @authentication_classes(())
 def user_login(request):
 	try:
-		user = User.objects.get(email=request.data["email"])
+		user = User.objects.get(email=request.data["email"], password=request.data["password"])
 	except Exception as e:
 		return Response("No such user", status=401)
 	user_serializer = UserSerializer(user)
