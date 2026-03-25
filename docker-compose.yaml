@@ -3,15 +3,12 @@ services:
     image: nginx:alpine
     container_name: subscriptions_nginx
     restart: always
-    ports:
-      - "8010:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./subscriptions-service/uploads:/app/uploads
     depends_on:
       - subscriptions
-    networks:
-      - gzg-money-network
+      
   subscriptions:
     build:
       context: ./subscriptions-service
@@ -27,9 +24,7 @@ services:
       - DB_NAME=${DB_NAME}
     volumes:
       - ./subscriptions-service/uploads:/app/uploads
-    networks:
-      - gzg-money-network
-
+   
   db:
     image: postgres:15-alpine
     container_name: subscriptions_db
@@ -37,10 +32,6 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
-    networks:
-      - gzg-money-network
-    volumes:
-      - subs_db_data:/var/lib/postgresql/data
       
   swagger-ui:
     image: swaggerapi/swagger-ui
@@ -51,15 +42,12 @@ services:
       SWAGGER_JSON: /openapi.yaml
     volumes:
       - ./openapi.yaml:/openapi.yaml:ro
-    networks:
-      - gzg-money-network
-      
+
   user-service:
     build:
       context: ./user-service/
     volumes:
       - ./user-service/backend:/backend
-
     environment:
       - DB_HOST=users-database
       - DB_NAME=dbname
@@ -67,21 +55,16 @@ services:
       - DB_PASS=pass
       - EMAIL= ${EMAIL}
       - EMAIL_PASS= ${EMAIL_PASS}
-
     command: >
       sh -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8080"
-
     depends_on:
       - users-database     
-    networks:
-      - gzg-money-network
       
   notify-service:
     build:
       context: ./user-service/
     volumes:
       - ./user-service/backend:/backend
-
     environment:
       - DB_HOST=users-database
       - DB_NAME=dbname
@@ -89,15 +72,11 @@ services:
       - DB_PASS=pass
       - EMAIL= ${EMAIL}
       - EMAIL_PASS= ${EMAIL_PASS}
-
     command: >
-      sh -c "python3 ./notiffications.py"
-
+      sh -c "python3 ./notifications.py"
     depends_on:
       - users-database  
       - user-service   
-    networks:
-      - gzg-money-network
 
   gateway-service:
     build:
@@ -111,9 +90,7 @@ services:
       - avatars_host=avatars
       - subscriptions_host=subscriptions
       - subavatars_host=nginx
-    networks:
-      - gzg-money-network
- 
+   
   avatars:
     build:
       context: ./user-service/backend/avatars/
@@ -121,8 +98,6 @@ services:
       - ./user-service/backend/avatars/:/usr/share/nginx/html/avatars/
     environment:
      - NGINX_PORT=8040
-    networks:
-      - gzg-money-network
       
   users-database:
     image: postgres:17.2-alpine3.21
@@ -130,12 +105,4 @@ services:
       - POSTGRES_DB=dbname
       - POSTGRES_USER=dbuser
       - POSTGRES_PASSWORD=pass
-    networks:
-      - gzg-money-network
       
-networks:
-  gzg-money-network:
-    driver: bridge
-volumes:
-  subs_db_data:
-  uploads:
